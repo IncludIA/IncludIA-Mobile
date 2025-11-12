@@ -2,30 +2,33 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ProfileStackParamList } from '../../navigation/AppNavigation';
+import { useTheme } from '../../context/ThemeContext';
+import { ProfileStackParamList } from '../../navigation/AppTabNavigator';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'PersonalProfile'>;
 
 export default function PersonalProfileScreen({ navigation }: Props) {
+    const { colors } = useTheme();
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={styles.header}>
                 <TouchableOpacity
                     style={styles.iconButton}
                     onPress={() => navigation.navigate('EditProfile')}
                 >
-                    <Ionicons name="pencil-outline" size={26} color="#333" />
+                    <Ionicons name="pencil-outline" size={26} color={colors.text} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.iconButton}
                     onPress={() => navigation.navigate('ConfigApp')}
                 >
-                    <Ionicons name="settings-outline" size={26} color="#333" />
+                    <Ionicons name="settings-outline" size={26} color={colors.text} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.content}>
-                <Text>Tela de Perfil Pessoal</Text>
+                <Text style={{ color: colors.text }}>Tela de Perfil Pessoal</Text>
             </View>
         </View>
     );
@@ -34,7 +37,6 @@ export default function PersonalProfileScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
     header: {
         width: '100%',

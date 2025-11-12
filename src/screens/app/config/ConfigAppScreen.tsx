@@ -12,8 +12,8 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ProfileStackParamList } from '../../../navigation/AppNavigation';
 import { Ionicons } from '@expo/vector-icons';
+import { ProfileStackParamList } from '../../../navigation/AppTabNavigator';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ConfigApp'>;
 
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        paddingTop: 40,
+        paddingTop: 10,
         paddingHorizontal: 20,
     },
     content: {
@@ -109,10 +109,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     separator: {
-        height: 40,
+        flex: 1,
     },
     buttonContainer: {
         width: '100%',
         marginTop: 15,
+        paddingBottom: 20,
     },
 });

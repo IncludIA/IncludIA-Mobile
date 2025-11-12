@@ -11,6 +11,7 @@ import {
     Platform,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AppNavigation';
 
@@ -22,6 +23,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     const { signIn } = useAuth();
+    const { colors } = useTheme();
 
     const handleLogin = async () => {
         if (isLoading) return;
@@ -44,22 +46,30 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
+            style={[styles.container, { backgroundColor: colors.background }]}
         >
             <View style={styles.innerContainer}>
-                <Text style={styles.title}>Login</Text>
+                <Text style={[styles.title, { color: colors.text }]}>Login</Text>
 
                 <TextInput
-                    style={styles.input}
+                    style={[
+                        styles.input,
+                        { backgroundColor: colors.card, color: colors.text, borderColor: colors.border },
+                    ]}
                     placeholder="Email"
+                    placeholderTextColor="#999"
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
                 <TextInput
-                    style={styles.input}
+                    style={[
+                        styles.input,
+                        { backgroundColor: colors.card, color: colors.text, borderColor: colors.border },
+                    ]}
                     placeholder="Senha"
+                    placeholderTextColor="#999"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
@@ -69,12 +79,13 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                     title={isLoading ? 'Entrando...' : 'Entrar'}
                     onPress={handleLogin}
                     disabled={isLoading}
+                    color={colors.primary}
                 />
 
                 <View style={styles.footer}>
-                    <Text>Não tem uma conta?</Text>
+                    <Text style={{ color: colors.text }}>Não tem uma conta?</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
-                        <Text style={styles.link}> Cadastre-se</Text>
+                        <Text style={[styles.link, { color: colors.primary }]}> Cadastre-se</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -91,18 +102,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#fff',
     },
     title: {
         fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 30,
-        color: '#333',
     },
     input: {
         width: '100%',
         height: 50,
-        borderColor: '#ddd',
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 15,
@@ -114,7 +122,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     link: {
-        color: '#007BFF',
         fontWeight: 'bold',
     },
 });
