@@ -47,8 +47,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             style={styles.container}
         >
             <View style={styles.innerContainer}>
-                <Text style={styles.title}>Includ.IA</Text>
-                <Text style={styles.subtitle}>Bem-vindo(a) de volta!</Text>
+                <Text style={styles.title}>Login</Text>
 
                 <TextInput
                     style={styles.input}
@@ -97,13 +96,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-    },
-    subtitle: {
-        fontSize: 18,
         marginBottom: 30,
-        color: '#666',
+        color: '#333',
     },
     input: {
         width: '100%',
@@ -120,7 +114,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     link: {
-        color: '#007BFF', // Cor de link
+        color: '#007BFF',
         fontWeight: 'bold',
     },
 });

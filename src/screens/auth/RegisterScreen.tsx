@@ -72,6 +72,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                     onChangeText={setPassword}
                     secureTextEntry
                 />
+
                 <Button
                     title={isLoading ? 'Criando...' : 'Cadastrar'}
                     onPress={handleRegister}
@@ -80,7 +81,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
                 <View style={styles.footer}>
                     <Text>Já tem uma conta?</Text>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                         <Text style={styles.link}> Faça Login</Text>
                     </TouchableOpacity>
                 </View>
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: 'bold',
-        marginBottom: 30, // Mais espaço
+        marginBottom: 30,
         color: '#333',
     },
     input: {

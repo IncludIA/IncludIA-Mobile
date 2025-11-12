@@ -1,22 +1,41 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ProfileStackParamList } from '../../navigation/AppNavigation';
 
-export default function ProfileScreen() {
-    const { signOut } = useAuth();
+type Props = NativeStackScreenProps<ProfileStackParamList, 'PersonalProfile'>;
 
+export default function PersonalProfileScreen({ navigation }: Props) {
     return (
-        <View style={styles.container}>
-            <Text>Tela de Perfil</Text>
-            <View style={{ marginTop: 20 }}>
-                <Button title="Sair (Logout)" onPress={signOut} color="#FF3B30" />
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.navigate('ConfigApp')}>
+                    <Ionicons name="settings-outline" size={24} color="#333" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+                    <Ionicons name="pencil-outline" size={24} color="#333" />
+                </TouchableOpacity>
             </View>
-        </View>
+            <View style={styles.content}>
+                <Text>Tela de Perfil Pessoal</Text>
+            </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingTop: 10,
+    },
+    content: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',

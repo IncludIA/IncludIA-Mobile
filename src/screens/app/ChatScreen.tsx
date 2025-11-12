@@ -1,17 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MatchesStackParamList } from '../../navigation/AppNavigation';
+import { ChatStackParamList } from '../../navigation/AppNavigation';
 
-type Props = NativeStackScreenProps<MatchesStackParamList, 'Chat'>;
+type Props = NativeStackScreenProps<ChatStackParamList, 'ChatList'>;
 
-export default function ChatScreen({ route }: Props) {
-    const { matchId } = route.params;
-
+export default function ChatScreen({ navigation }: Props) {
     return (
         <View style={styles.container}>
-            <Text>Tela de Chat</Text>
-            <Text>Chat ID: {matchId}</Text>
+            <Text>Lista de Conversas</Text>
+            <Button
+                title="Abrir Chat com 'Match 1'"
+                onPress={() => navigation.navigate('ChatMessage', { matchId: '123' })}
+            />
+            <Button
+                title="Abrir Chat com 'Match 2'"
+                onPress={() => navigation.navigate('ChatMessage', { matchId: '456' })}
+            />
         </View>
     );
 }

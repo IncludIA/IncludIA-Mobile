@@ -1,18 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MatchesStackParamList } from '../../navigation/AppNavigation';
+import { View, Text, StyleSheet } from 'react-native';
 
-type Props = NativeStackScreenProps<MatchesStackParamList, 'Matches'>;
-
-export default function MatchesScreen({ navigation }: Props) {
+export default function MatchesScreen() {
     return (
         <View style={styles.container}>
             <Text>Tela de Matches</Text>
-            <Button
-                title="Ir para Chat (Exemplo)"
-                onPress={() => navigation.navigate('Chat', { matchId: '123' })}
-            />
+            <Text style={styles.subtitle}>
+                Aqui você verá quem curtiu você e quem você curtiu.
+            </Text>
         </View>
     );
 }
@@ -22,5 +17,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    subtitle: {
+        marginTop: 10,
+        fontSize: 14,
+        color: '#888',
+        textAlign: 'center',
+        paddingHorizontal: 20,
     },
 });
