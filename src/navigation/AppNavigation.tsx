@@ -1,45 +1,17 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useAuth } from '../context/AuthContext'; // Nosso hook de autenticação
+import { useAuth } from '../context/AuthContext';
 
-// Importe suas telas
-// (Assumindo que você já tem LoginScreen e RegisterScreen)
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 
-// (Assumindo que você ainda não tem as outras, criaremos placeholders)
 import HomeScreen from '../screens/app/HomeScreen';
-import MatchesScreen from '../screens/app/MatchScreen';
-import ChatScreen from '../screens/app/ChatScreen';
 import ProfileScreen from '../screens/app/ProfileScreen';
+import ChatScreen from '../screens/app/ChatScreen';
+import MatchesScreen from '../screens/app/MatchesScreen';
+import SplashScreen from '../screens/app/SplashScreen';
 
-const SplashScreen = () => (
-    <View style={styles.container}>
-        <ActivityIndicator size="large" />
-    </View>
-);
-const HomeScreen = () => (
-    <View style={styles.container}>
-        <Text>Tela de Home (Swipe)</Text>
-    </View>
-);
-const MatchesScreen = () => (
-    <View style={styles.container}>
-        <Text>Tela de Matches</Text>
-    </View>
-);
-const ChatScreen = () => (
-    <View style={styles.container}>
-        <Text>Tela de Chat</Text>
-    </View>
-);
-const ProfileScreen = () => (
-    <View style={styles.container}>
-        <Text>Tela de Perfil</Text>
-    </View>
-);
 
 export type AuthStackParamList = {
     Login: undefined;
@@ -48,7 +20,6 @@ export type AuthStackParamList = {
 
 export type HomeStackParamList = {
     Home: undefined;
-    UserDetails: { userId: string };
 };
 
 export type MatchesStackParamList = {
@@ -75,7 +46,6 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const HomeNavigator = () => (
     <HomeStack.Navigator>
         <HomeStack.Screen name="Home" component={HomeScreen} options={{ title: 'Includ.IA' }} />
-        {/*<HomeStack.Screen name="UserDetails" component={UserDetailsScreen} /> */}
     </HomeStack.Navigator>
 );
 
@@ -123,6 +93,7 @@ export default function AppNavigator() {
     if (isLoading) {
         return <SplashScreen />;
     }
+
     return (
         <Root.Navigator screenOptions={{ headerShown: false }}>
             {userToken == null ? (
@@ -133,11 +104,3 @@ export default function AppNavigator() {
         </Root.Navigator>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});

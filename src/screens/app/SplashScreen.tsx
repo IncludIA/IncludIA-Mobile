@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
-export default function ConfigAppScreen() {
+export default function SplashScreen() {
     return (
         <View style={styles.container}>
-            <Text>Tela de Configurações do App</Text>
+            <ActivityIndicator size="large" color="#007BFF" />
         </View>
     );
 }
@@ -14,5 +14,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#FFFFFF',
     },
 });
