@@ -13,9 +13,8 @@ import ChatScreen from '../screens/app/ChatScreen';
 import ChatMessageScreen from '../screens/app/ChatMessageScreen';
 import PersonalProfileScreen from '../screens/app/PersonalProfileScreen';
 import EditProfileScreen from '../screens/app/EditProfileScreen';
-import ConfigAppScreen from '../screens/app/PersonalProfileScreen';
+import ConfigAppScreen from '../screens/app/config/ConfigAppScreen';
 import SplashScreen from '../screens/app/SplashScreen';
-
 
 export type AuthStackParamList = {
     Cadastro: undefined;
@@ -53,8 +52,6 @@ export type RootStackParamList = {
     App: undefined;
 };
 
-// --- NAVEGADORES ANINHADOS ---
-
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const HomeNavigator = () => (
     <HomeStack.Navigator>
@@ -80,12 +77,19 @@ const ChatNavigator = () => (
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const ProfileNavigator = () => (
     <ProfileStack.Navigator>
-        <ProfileStack.Screen name="PersonalProfile" component={PersonalProfileScreen} options={{ title: 'Perfil' }} />
+        <ProfileStack.Screen
+            name="PersonalProfile"
+            component={PersonalProfileScreen}
+            options={{ headerShown: false }}
+        />
         <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
-        <ProfileStack.Screen name="ConfigApp" component={ConfigAppScreen} options={{ title: 'Configurações' }} />
+        <ProfileStack.Screen
+            name="ConfigApp"
+            component={ConfigAppScreen}
+            options={{ headerShown: false }}
+        />
     </ProfileStack.Navigator>
 );
-
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 const AppTabNavigator = () => {
@@ -121,7 +125,6 @@ const AppTabNavigator = () => {
     );
 };
 
-
 const Auth = createNativeStackNavigator<AuthStackParamList>();
 const AuthNavigator = () => {
     return (
@@ -131,7 +134,6 @@ const AuthNavigator = () => {
         </Auth.Navigator>
     );
 };
-
 
 const Root = createNativeStackNavigator<RootStackParamList>();
 export default function AppNavigator() {
