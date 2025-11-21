@@ -9,10 +9,42 @@ import { Ionicons } from '@expo/vector-icons';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import api from '../../services/api';
 
+// --- GERADORES DE DOCUMENTOS VÁLIDOS PARA PASSAR NA VALIDAÇÃO DO JAVA ---
+const generateCPF = (): string => {
+    const rnd = (n: number) => Math.round(Math.random() * n);
+    const mod = (dividendo: number, divisor: number) => Math.round(dividendo - (Math.floor(dividendo / divisor) * divisor));
+    const n1 = rnd(9); const n2 = rnd(9); const n3 = rnd(9);
+    const n4 = rnd(9); const n5 = rnd(9); const n6 = rnd(9);
+    const n7 = rnd(9); const n8 = rnd(9); const n9 = rnd(9);
+    let d1 = n9 * 2 + n8 * 3 + n7 * 4 + n6 * 5 + n5 * 6 + n4 * 7 + n3 * 8 + n2 * 9 + n1 * 10;
+    d1 = 11 - (mod(d1, 11));
+    if (d1 >= 10) d1 = 0;
+    let d2 = d1 * 2 + n9 * 3 + n8 * 4 + n7 * 5 + n6 * 6 + n5 * 7 + n4 * 8 + n3 * 9 + n2 * 10 + n1 * 11;
+    d2 = 11 - (mod(d2, 11));
+    if (d2 >= 10) d2 = 0;
+    return `${n1}${n2}${n3}${n4}${n5}${n6}${n7}${n8}${n9}${d1}${d2}`;
+};
+
+const generateCNPJ = (): string => {
+    const rnd = (n: number) => Math.round(Math.random() * n);
+    const mod = (dividendo: number, divisor: number) => Math.round(dividendo - (Math.floor(dividendo / divisor) * divisor));
+    const n = Array(8).fill(0).map(() => rnd(9));
+    const n9 = 0; const n10 = 0; const n11 = 0; const n12 = 1; // Filial 0001
+    let d1 = n12 * 2 + n11 * 3 + n10 * 4 + n9 * 5 + n[7] * 6 + n[6] * 7 + n[5] * 8 + n[4] * 9 + n[3] * 2 + n[2] * 3 + n[1] * 4 + n[0] * 5;
+    d1 = 11 - (mod(d1, 11));
+    if (d1 >= 10) d1 = 0;
+    let d2 = d1 * 2 + n12 * 3 + n11 * 4 + n10 * 5 + n9 * 6 + n[7] * 7 + n[6] * 8 + n[5] * 9 + n[4] * 2 + n[3] * 3 + n[2] * 4 + n[1] * 5 + n[0] * 6;
+    d2 = 11 - (mod(d2, 11));
+    if (d2 >= 10) d2 = 0;
+    return `${n.join('')}${n9}${n10}${n11}${n12}${d1}${d2}`;
+};
+// -----------------------------------------------------------------------
+
 export default function LoginScreen({ navigation }: any) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [demoLoading, setDemoLoading] = useState<'candidate' | 'recruiter' | null>(null);
 
     const [errors, setErrors] = useState({ email: false, password: false });
 
@@ -24,17 +56,16 @@ export default function LoginScreen({ navigation }: any) {
             email: !email.trim(),
             password: !password.trim()
         };
-
         setErrors(newErrors);
 
-        if (newErrors.email || newErrors.password) {
-            return;
-        }
+        if (newErrors.email || newErrors.password) return;
 
         setLoading(true);
         try {
             await signIn(email, password);
-        } catch (error) {
+        } catch (error: any) {
+            // Loga o erro real do backend para você ver no terminal
+            console.log("Erro Login:", error.response?.data || error.message);
             Alert.alert('Erro de Acesso', 'Email ou senha incorretos.');
         } finally {
             setLoading(false);
@@ -51,16 +82,18 @@ export default function LoginScreen({ navigation }: any) {
         }
     ];
 
-    const handleDemoLogin = async () => {
-        setLoading(true);
+    // --- DEMO CANDIDATO ---
+    const handleDemoCandidate = async () => {
+        setDemoLoading('candidate');
         const uniqueId = Date.now();
-        const demoEmail = `avaliador${uniqueId}@fiap.com`;
+        const demoEmail = `candidato${uniqueId}@fiap.com`;
         const demoPass = "fiap123456";
-        const demoCpf = (uniqueId.toString() + "00000000000").slice(0, 11);
+        const demoCpf = generateCPF(); // USA GERADOR VÁLIDO
 
         try {
+            console.log(`Tentando criar candidato: ${demoEmail} CPF: ${demoCpf}`);
             await api.post('/auth/register-candidate', {
-                nome: `Avaliador FIAP ${uniqueId}`,
+                nome: `Candidato FIAP`,
                 email: demoEmail,
                 senha: demoPass,
                 cpf: demoCpf,
@@ -70,15 +103,64 @@ export default function LoginScreen({ navigation }: any) {
             });
             await signIn(demoEmail, demoPass);
         } catch (error: any) {
-            if (error.message?.includes("Network Error")) {
-                Alert.alert("Erro de Conexão", "O Backend Java parece estar desligado. Reinicie a aplicação Java.");
-            } else {
-                try { await signIn("admin@includia.com", "admin1234"); } catch (e) { }
-            }
+            handleDemoError(error);
         } finally {
-            setLoading(false);
+            setDemoLoading(null);
         }
     };
+
+    // --- DEMO RECRUTADOR ---
+    const handleDemoRecruiter = async () => {
+        setDemoLoading('recruiter');
+        const uniqueId = Date.now();
+        const demoEmail = `recrutador${uniqueId}@fiap.com`;
+        const demoPass = "fiap123456";
+        const validCNPJ = generateCNPJ(); // USA GERADOR VÁLIDO
+
+        try {
+            console.log(`Tentando criar empresa CNPJ: ${validCNPJ}`);
+
+            // 1. Cria empresa
+            const novaEmpresa = await api.post('/empresas', {
+                nomeOficial: `Empresa Demo ${uniqueId}`,
+                nomeFantasia: `Startup FIAP`,
+                cnpj: validCNPJ,
+                localizacao: "São Paulo, SP",
+                descricao: "Empresa criada automaticamente para teste de recrutador.",
+                cultura: "Inovação e Agilidade"
+            });
+
+            const empresaId = novaEmpresa.data.id;
+
+            // 2. Cria recrutador
+            await api.post('/auth/register-recruiter', {
+                nome: `Recrutador FIAP`,
+                email: demoEmail,
+                senha: demoPass,
+                empresaId: empresaId
+            });
+
+            // 3. Loga
+            await signIn(demoEmail, demoPass);
+
+        } catch (error: any) {
+            handleDemoError(error);
+        } finally {
+            setDemoLoading(null);
+        }
+    };
+
+    const handleDemoError = (error: any) => {
+        console.error("Erro Detalhado:", error.response?.data); // Isso vai mostrar no seu terminal o motivo do 400
+
+        const msg = error.response?.data?.erro || error.message;
+
+        if (msg?.includes("Network Error")) {
+            Alert.alert("Erro de Conexão", "O Backend Java parece estar desligado.");
+        } else {
+            Alert.alert("Erro Demo", `Falha: ${JSON.stringify(msg) || 'Verifique o console'}`);
+        }
+    }
 
     const handleAppleLogin = async () => {
         try {
@@ -134,20 +216,42 @@ export default function LoginScreen({ navigation }: any) {
                         secureTextEntry
                     />
 
-                    <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleLogin} disabled={loading}>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleLogin} disabled={loading || !!demoLoading}>
                         {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Entrar</Text>}
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.demoButton, { borderColor: colors.primary }]} onPress={handleDemoLogin} disabled={loading}>
-                        {loading ? (
-                            <ActivityIndicator size="small" color={colors.primary} />
-                        ) : (
-                            <>
-                                <Ionicons name="flash" size={20} color={colors.primary} />
-                                <Text style={[styles.demoText, { color: colors.primary }]}>Entrar Automaticamente (Demo)</Text>
-                            </>
-                        )}
-                    </TouchableOpacity>
+                    <View style={styles.demoContainer}>
+                        <TouchableOpacity
+                            style={[styles.demoButton, { borderColor: colors.primary }]}
+                            onPress={handleDemoCandidate}
+                            disabled={loading || !!demoLoading}
+                        >
+                            {demoLoading === 'candidate' ? (
+                                <ActivityIndicator size="small" color={colors.primary} />
+                            ) : (
+                                <>
+                                    <Ionicons name="person" size={16} color={colors.primary} />
+                                    <Text style={[styles.demoText, { color: colors.primary }]}>Demo Candidato</Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.demoButton, { borderColor: '#FF9500' }]}
+                            onPress={handleDemoRecruiter}
+                            disabled={loading || !!demoLoading}
+                        >
+                            {demoLoading === 'recruiter' ? (
+                                <ActivityIndicator size="small" color="#FF9500" />
+                            ) : (
+                                <>
+                                    <Ionicons name="briefcase" size={16} color="#FF9500" />
+                                    <Text style={[styles.demoText, { color: '#FF9500' }]}>Demo Recrutador</Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
 
                 <View style={styles.dividerBox}>
@@ -179,7 +283,6 @@ export default function LoginScreen({ navigation }: any) {
                         <Text style={{ color: colors.primary, fontWeight: 'bold', marginTop: 5 }}>Criar Conta</Text>
                     </TouchableOpacity>
                 </TouchableOpacity>
-
             </View>
         </KeyboardAvoidingView >
     );
@@ -196,8 +299,21 @@ const styles = StyleSheet.create({
     input: { height: 56, borderRadius: 16, borderWidth: 1, paddingHorizontal: 16, fontSize: 16 },
     button: { height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 10, elevation: 4 },
     buttonText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
-    demoButton: { height: 56, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 8 },
-    demoText: { fontSize: 16, fontWeight: '600' },
+
+    demoContainer: { flexDirection: 'row', gap: 12, marginTop: 8 },
+    demoButton: {
+        flex: 1,
+        height: 48,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 6
+    },
+    demoText: { fontSize: 14, fontWeight: '600' },
+
     dividerBox: { flexDirection: 'row', alignItems: 'center', marginVertical: 32 },
     line: { flex: 1, height: 1 },
     dividerText: { paddingHorizontal: 16, fontSize: 14, opacity: 0.5 },
