@@ -1,7 +1,6 @@
 import { ExpoConfig, ConfigContext } from 'expo/config';
 import * as child_process from 'child_process';
 
-// Função para pegar o hash do commit
 const getGitCommitHash = () => {
   try {
     return child_process.execSync('git rev-parse --short HEAD').toString().trim();
@@ -14,15 +13,15 @@ const commitHash = getGitCommitHash();
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "IncludIA-Mobile",
-  slug: "IncludIA-Mobile",
+  name: "Includ.IA",
+  slug: "Includ.IA",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/icon.png",
+  icon: "./assets/icone.png",
   userInterfaceStyle: "light",
   newArchEnabled: true,
   splash: {
-    image: "./assets/splash-icon.png",
+    image: "./assets/icone.png",
     resizeMode: "contain",
     backgroundColor: "#ffffff"
   },
@@ -31,13 +30,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./assets/adaptive-icon.png",
+      foregroundImage: "./assets/icone.png",
       backgroundColor: "#ffffff"
     },
     edgeToEdgeEnabled: true
   },
   web: {
-    favicon: "./assets/favicon.png"
+    favicon: "./assets/icone.png"
   },
   plugins: [
     "expo-secure-store",
