@@ -1,6 +1,4 @@
 
-
-````markdown
 # 🚀 Includ.IA - Mobile
 
 > **O Futuro do Trabalho é Inclusivo.**
