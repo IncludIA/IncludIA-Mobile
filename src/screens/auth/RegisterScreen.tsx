@@ -10,12 +10,30 @@ import api from '../../services/api';
 
 type UserType = 'candidate' | 'recruiter';
 
+// Função auxiliar para formatar CPF (XXX.XXX.XXX-XX)
+const formatCPF = (value: string) => {
+    return value
+        .replace(/\D/g, '') // Remove tudo o que não é dígito
+        .replace(/(\d{3})(\d)/, '$1.$2') // Coloca o 1º ponto
+        .replace(/(\d{3})(\d)/, '$1.$2') // Coloca o 2º ponto
+        .replace(/(\d{3})(\d{1,2})/, '$1-$2') // Coloca o traço
+        .replace(/(-\d{2})\d+?$/, '$1'); // Limita o tamanho
+};
+
 export default function RegisterScreen({ navigation }: any) {
     const { signIn } = useAuth();
     const { colors } = useTheme();
 
     const [userType, setUserType] = useState<UserType>('candidate');
     const [loading, setLoading] = useState(false);
+
+    // Estado para controlar quais campos estão com erro (vazios)
+    const [errors, setErrors] = useState({
+        nome: false,
+        email: false,
+        senha: false,
+        cpf: false
+    });
 
     const [formData, setFormData] = useState({
         nome: '',
@@ -24,50 +42,68 @@ export default function RegisterScreen({ navigation }: any) {
         cpf: '',
         cidade: 'São Paulo',
         estado: 'SP',
-        // Campo extra para recrutador (opcional na interface, obrigatório na API)
         empresaId: ''
     });
 
+    // Handler específico para CPF para aplicar a máscara
+    const handleCpfChange = (text: string) => {
+        const formatted = formatCPF(text);
+        setFormData({ ...formData, cpf: formatted });
+        // Limpa o erro se o usuário começar a digitar
+        if (errors.cpf) setErrors({ ...errors, cpf: false });
+    };
+
+    const validateForm = () => {
+        const newErrors = {
+            nome: !formData.nome.trim(),
+            email: !formData.email.trim(),
+            senha: !formData.senha.trim(),
+            // CPF só é validado se for Candidato
+            cpf: userType === 'candidate' && !formData.cpf.trim()
+        };
+
+        setErrors(newErrors);
+        return !Object.values(newErrors).some(hasError => hasError);
+    };
+
     const handleRegister = async () => {
-        // Validação básica comum
-        if (!formData.nome || !formData.email || !formData.senha) {
-            return Alert.alert('Erro', 'Preencha os campos obrigatórios.');
+        if (!validateForm()) {
+            return Alert.alert('Atenção', 'Preencha os campos destacados em vermelho.');
         }
 
         setLoading(true);
+
+        // Remove pontuação do CPF para enviar limpo ao Backend (opcional, mas recomendado)
+        const cpfLimpo = formData.cpf.replace(/\D/g, '');
+
         try {
             if (userType === 'candidate') {
-                if (!formData.cpf) throw new Error('CPF é obrigatório para candidatos.');
+                if (cpfLimpo.length !== 11) throw new Error('CPF inválido. Digite os 11 números.');
 
-                // 1. Registrar Candidato
                 await api.post('/auth/register-candidate', {
                     nome: formData.nome,
                     email: formData.email,
                     senha: formData.senha,
-                    cpf: formData.cpf,
+                    cpf: cpfLimpo, // Envia apenas números
                     cidade: formData.cidade,
                     estado: formData.estado
                 });
 
             } else {
-                // Lógica Inteligente para Recrutador
                 let companyIdToUse = formData.empresaId;
 
-                // Se não informou ID da empresa, cria uma "Empresa Padrão" na hora (UX de Startup)
                 if (!companyIdToUse) {
-                    const cnpjRandom = Date.now().toString().slice(0, 14); // CNPJ fictício único
+                    const cnpjRandom = Date.now().toString().slice(0, 14);
                     const novaEmpresa = await api.post('/empresas', {
                         nomeOficial: "Minha Empresa " + cnpjRandom.slice(-4),
                         nomeFantasia: "Startup Demo",
                         cnpj: cnpjRandom,
                         localizacao: "São Paulo, SP",
-                        descricao: "Empresa criada automaticamente via App Mobile."
+                        descricao: "Empresa criada via App."
                     });
                     companyIdToUse = novaEmpresa.data.id;
-                    console.log("Empresa criada automaticamente:", companyIdToUse);
                 }
 
-                // 2. Registrar Recrutador
                 await api.post('/auth/register-recruiter', {
                     nome: formData.nome,
                     email: formData.email,
@@ -76,37 +112,64 @@ export default function RegisterScreen({ navigation }: any) {
                 });
             }
 
-            // 3. Login Automático após sucesso
             await signIn(formData.email, formData.senha);
 
         } catch (error: any) {
             console.error(error);
-            const msg = error.response?.data?.erro || error.message || 'Falha ao criar conta.';
-            Alert.alert('Erro no Cadastro', msg);
+
+            // Lógica Inteligente: Detecta se o erro é de conflito (409 - Email/CPF já existe)
+            if (error.response?.status === 409) {
+                Alert.alert(
+                    'Conta Existente',
+                    'Este e-mail ou CPF já possui cadastro. Vamos te levar para o login.',
+                    [
+                        { text: 'Ir para Login', onPress: () => navigation.navigate('Login') }
+                    ]
+                );
+            } else {
+                const msg = error.response?.data?.erro || error.message || 'Falha ao criar conta.';
+                Alert.alert('Erro no Cadastro', msg);
+            }
         } finally {
             setLoading(false);
         }
     };
 
+    // Função auxiliar para estilo de input com erro
+    const getInputStyle = (hasError: boolean) => [
+        styles.input,
+        { backgroundColor: colors.card, color: colors.text, borderColor: hasError ? '#FF3B30' : colors.border },
+        hasError && { borderWidth: 1.5 } // Engrossa a borda se tiver erro
+    ];
+
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.headerContainer}>
+
+            <View style={styles.navHeader}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={[styles.headerTitle, { color: colors.text }]}>Criar Conta</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-                {/* SELETOR DE TIPO DE CONTA (Segmented Control) */}
+                <View style={styles.logoSection}>
+                    <View style={styles.iconBg}>
+                        <Ionicons name="prism" size={40} color={colors.primary} />
+                    </View>
+                    <Text style={[styles.headerTitle, { color: colors.text }]}>Criar Conta</Text>
+                    <Text style={[styles.headerSubtitle, { color: colors.text }]}>
+                        Junte-se ao futuro do trabalho.
+                    </Text>
+                </View>
+
                 <View style={[styles.toggleContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <TouchableOpacity
                         style={[styles.toggleBtn, userType === 'candidate' && styles.toggleBtnActive]}
                         onPress={() => setUserType('candidate')}
                     >
                         <Ionicons name="person" size={16} color={userType === 'candidate' ? '#FFF' : colors.text} />
-                        <Text style={[styles.toggleText, { color: userType === 'candidate' ? '#FFF' : colors.text }]}>Sou Candidato</Text>
+                        <Text style={[styles.toggleText, { color: userType === 'candidate' ? '#FFF' : colors.text }]}>Candidato</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -114,46 +177,58 @@ export default function RegisterScreen({ navigation }: any) {
                         onPress={() => setUserType('recruiter')}
                     >
                         <Ionicons name="briefcase" size={16} color={userType === 'recruiter' ? '#FFF' : colors.text} />
-                        <Text style={[styles.toggleText, { color: userType === 'recruiter' ? '#FFF' : colors.text }]}>Sou Recrutador</Text>
+                        <Text style={[styles.toggleText, { color: userType === 'recruiter' ? '#FFF' : colors.text }]}>Recrutador</Text>
                     </TouchableOpacity>
                 </View>
 
                 <View style={styles.form}>
-                    <Text style={[styles.sectionLabel, { color: colors.text }]}>Dados de Acesso</Text>
-
                     <TextInput
-                        style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+                        style={getInputStyle(errors.nome)}
                         placeholder="Nome Completo"
                         placeholderTextColor="#999"
-                        onChangeText={t => setFormData({ ...formData, nome: t })}
+                        onChangeText={t => {
+                            setFormData({ ...formData, nome: t });
+                            if (errors.nome) setErrors({ ...errors, nome: false });
+                        }}
                     />
                     <TextInput
-                        style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+                        style={getInputStyle(errors.email)}
                         placeholder="Email"
                         placeholderTextColor="#999"
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        onChangeText={t => setFormData({ ...formData, email: t })}
+                        onChangeText={t => {
+                            setFormData({ ...formData, email: t });
+                            if (errors.email) setErrors({ ...errors, email: false });
+                        }}
                     />
                     <TextInput
-                        style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+                        style={getInputStyle(errors.senha)}
                         placeholder="Senha (mínimo 8 caracteres)"
                         placeholderTextColor="#999"
                         secureTextEntry
-                        onChangeText={t => setFormData({ ...formData, senha: t })}
+                        onChangeText={t => {
+                            setFormData({ ...formData, senha: t });
+                            if (errors.senha) setErrors({ ...errors, senha: false });
+                        }}
                     />
 
-                    {/* CAMPOS ESPECÍFICOS DE CANDIDATO */}
                     {userType === 'candidate' && (
                         <>
-                            <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 10 }]}>Perfil Profissional</Text>
+                            <View style={styles.dividerBox}>
+                                <View style={[styles.line, { backgroundColor: colors.border }]} />
+                                <Text style={[styles.dividerText, { color: colors.text }]}>DADOS PROFISSIONAIS</Text>
+                                <View style={[styles.line, { backgroundColor: colors.border }]} />
+                            </View>
+
                             <TextInput
-                                style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                                placeholder="CPF (apenas números)"
+                                style={getInputStyle(errors.cpf)}
+                                placeholder="CPF (000.000.000-00)"
                                 placeholderTextColor="#999"
                                 keyboardType="numeric"
-                                maxLength={11}
-                                onChangeText={t => setFormData({ ...formData, cpf: t })}
+                                maxLength={14} // 11 números + 3 caracteres
+                                value={formData.cpf}
+                                onChangeText={handleCpfChange} // Usa o formatador
                             />
                             <View style={styles.row}>
                                 <TextInput
@@ -175,19 +250,23 @@ export default function RegisterScreen({ navigation }: any) {
                         </>
                     )}
 
-                    {/* CAMPOS ESPECÍFICOS DE RECRUTADOR */}
                     {userType === 'recruiter' && (
                         <>
-                            <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 10 }]}>Dados da Empresa</Text>
+                            <View style={styles.dividerBox}>
+                                <View style={[styles.line, { backgroundColor: colors.border }]} />
+                                <Text style={[styles.dividerText, { color: colors.text }]}>EMPRESA</Text>
+                                <View style={[styles.line, { backgroundColor: colors.border }]} />
+                            </View>
+
                             <View style={[styles.infoBox, { backgroundColor: 'rgba(0,123,255,0.1)' }]}>
                                 <Ionicons name="information-circle" size={20} color={colors.primary} />
                                 <Text style={[styles.infoText, { color: colors.text }]}>
-                                    Se deixar o ID vazio, criaremos uma empresa fictícia para você testar a plataforma.
+                                    Deixe vazio para criar uma empresa de teste automaticamente.
                                 </Text>
                             </View>
                             <TextInput
                                 style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                                placeholder="ID da Empresa (Opcional para teste)"
+                                placeholder="ID da Empresa (Opcional)"
                                 placeholderTextColor="#999"
                                 onChangeText={t => setFormData({ ...formData, empresaId: t })}
                             />
@@ -203,7 +282,7 @@ export default function RegisterScreen({ navigation }: any) {
                             <ActivityIndicator color="#FFF" />
                         ) : (
                             <Text style={styles.buttonText}>
-                                {userType === 'candidate' ? 'Cadastrar como Candidato' : 'Cadastrar como Recrutador'}
+                                {userType === 'candidate' ? 'Finalizar Cadastro' : 'Criar Conta'}
                             </Text>
                         )}
                     </TouchableOpacity>
@@ -215,19 +294,28 @@ export default function RegisterScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    headerContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingTop: 60, paddingBottom: 20 },
-    backBtn: { marginRight: 16 },
-    headerTitle: { fontSize: 24, fontWeight: 'bold' },
+
+    navHeader: { paddingTop: 60, paddingHorizontal: 24, paddingBottom: 10 },
+    backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-start' },
+
     scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
+
+    logoSection: { alignItems: 'center', marginBottom: 32 },
+    iconBg: { width: 80, height: 80, borderRadius: 24, backgroundColor: '#F0F5FF', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+    headerTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -1, marginBottom: 4 },
+    headerSubtitle: { fontSize: 16, opacity: 0.6, textAlign: 'center' },
 
     toggleContainer: { flexDirection: 'row', borderRadius: 12, borderWidth: 1, padding: 4, marginBottom: 24 },
     toggleBtn: { flex: 1, flexDirection: 'row', paddingVertical: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 8, gap: 8 },
     toggleBtnActive: { backgroundColor: '#007BFF' },
     toggleText: { fontWeight: '600', fontSize: 14 },
 
-    sectionLabel: { fontSize: 14, fontWeight: '700', marginBottom: 12, opacity: 0.6, textTransform: 'uppercase' },
+    dividerBox: { flexDirection: 'row', alignItems: 'center', marginVertical: 16 },
+    line: { flex: 1, height: 1 },
+    dividerText: { paddingHorizontal: 12, fontSize: 12, fontWeight: '700', opacity: 0.5, letterSpacing: 1 },
+
     form: { gap: 12 },
-    input: { height: 50, borderRadius: 12, borderWidth: 1, paddingHorizontal: 16, fontSize: 16 },
+    input: { height: 56, borderRadius: 12, borderWidth: 1, paddingHorizontal: 16, fontSize: 16 },
     row: { flexDirection: 'row', gap: 12 },
     flexInput: { flex: 1 },
     smallInput: { width: 80, textAlign: 'center' },
@@ -235,6 +323,6 @@ const styles = StyleSheet.create({
     infoBox: { flexDirection: 'row', padding: 12, borderRadius: 8, gap: 10, alignItems: 'center', marginBottom: 4 },
     infoText: { flex: 1, fontSize: 13, lineHeight: 18 },
 
-    button: { height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginTop: 24, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 10, elevation: 5 },
+    button: { height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginTop: 16, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 10, elevation: 5 },
     buttonText: { color: '#FFF', fontSize: 16, fontWeight: '700' }
 });

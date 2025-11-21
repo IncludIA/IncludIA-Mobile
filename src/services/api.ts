@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const api = axios.create({
-    baseURL: 'http://192.168.15.51:8080', // Seu IP atual confirmado
-    timeout: 15000, // Aumentei o timeout para redes lentas
+    baseURL: 'http://192.168.15.51:8080',
+    timeout: 15000,
 });
 
 api.interceptors.request.use(async (config) => {
