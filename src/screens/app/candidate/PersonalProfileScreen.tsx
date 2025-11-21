@@ -6,8 +6,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '../../context/ThemeContext';
-import api from '../../services/api';
+import api from '../../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 

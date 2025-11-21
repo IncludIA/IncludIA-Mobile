@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 
+
 // --- INTERFACE (Baseada no Java) ---
 interface MatchItem {
     id: string;

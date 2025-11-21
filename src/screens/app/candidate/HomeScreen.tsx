@@ -5,14 +5,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from '../../context/ThemeContext';
-import api from '../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
+import api from '../../../services/api';
+
 
 const { width, height } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
 const SWIPE_OUT_DURATION = 250;
 
-// --- TIPAGENS ATUALIZADAS (PUT da Vaga) ---
 interface Empresa {
     id: string;
     nomeFantasia: string;
@@ -137,14 +137,12 @@ export default function HomeScreen({ navigation }: any) {
                 allVagas = res.data.content?.length ? res.data.content : MOCK_VAGAS;
             } catch { allVagas = MOCK_VAGAS; }
 
-            // Enriquecimento
             allVagas = allVagas.map(v => ({
                 ...v,
                 distanciaKm: v.distanciaKm || Math.floor(Math.random() * 15) + 1,
                 matchPercent: calculateMatch(v.skills)
             }));
 
-            // --- FILTRAGEM AVANÇADA ---
             if (currentFilters.modelo !== 'TODOS') {
                 allVagas = allVagas.filter(v => v.modeloTrabalho === currentFilters.modelo);
             }
@@ -158,7 +156,6 @@ export default function HomeScreen({ navigation }: any) {
                 allVagas = allVagas.filter(v => (v.matchPercent || 0) > 70);
             }
 
-            // Ordenação
             if (currentFilters.ordenarPor === 'SALARIO') allVagas.sort((a, b) => b.salarioMax - a.salarioMax);
 
             setVagas(allVagas);
@@ -171,7 +168,6 @@ export default function HomeScreen({ navigation }: any) {
         return 40 + Math.round((common.length / skills.length) * 60);
     };
 
-    // --- SWIPE LOGIC ---
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,

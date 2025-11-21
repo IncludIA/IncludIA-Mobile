@@ -1,19 +1,14 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function MatchDetailScreen({ route, navigation }: any) {
     const { colors } = useTheme();
-
-    // --- PROTEÇÃO CONTRA ERRO ---
-    // Se route.params não existir (ex: reload da página), usamos undefined
     const matchData = route.params?.matchData;
 
-    // Se não tiver dados, mostramos loading e voltamos para a tela anterior
     if (!matchData) {
         useEffect(() => {
-            // Volta para a lista de matches automaticamente se der erro
             navigation.goBack();
         }, []);
 
@@ -24,7 +19,6 @@ export default function MatchDetailScreen({ route, navigation }: any) {
             </View>
         );
     }
-    // ----------------------------
 
     const { jobVaga, recruiter } = matchData;
     const { empresa } = jobVaga;

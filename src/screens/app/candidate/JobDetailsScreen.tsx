@@ -4,8 +4,8 @@ import {
     SafeAreaView, StatusBar, Alert, Share, Platform, Dimensions, ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import api from '../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
+import api from '../../../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -14,7 +14,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
     const { colors } = useTheme();
     const [loading, setLoading] = useState(false);
 
-    // --- FORMATAÇÃO DE DADOS ---
     const formatSalary = (min: number, max: number) => {
         if (!min && !max) return "A combinar";
         return `R$ ${(min / 1000).toFixed(1)}k - ${(max / 1000).toFixed(1)}k`;
@@ -25,7 +24,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
         return text.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
     };
 
-    // --- AÇÕES ---
     const handleApply = async () => {
         setLoading(true);
         try {
@@ -49,7 +47,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
         }
     };
 
-    // --- COMPONENTES INTERNOS ---
     const InfoCard = ({ icon, label, value, color }: any) => (
         <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={[styles.iconCircle, { backgroundColor: color + '20' }]}>
@@ -71,7 +68,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                 contentContainerStyle={{ paddingBottom: 100 }}
                 bounces={false}
             >
-                {/* HEADER IMAGEM */}
                 <View style={styles.imageContainer}>
                     <Image
                         source={{ uri: jobData.empresa.fotoCapaUrl || 'https://source.unsplash.com/random/800x600/?office' }}
@@ -79,19 +75,15 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                     />
                     <View style={styles.overlay} />
 
-                    {/* Barra de Navegação Flutuante */}
                     <SafeAreaView style={styles.navBar}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.circleBtn}>
                             <Ionicons name="arrow-back" size={24} color="#FFF" />
                         </TouchableOpacity>
-
-                        {/* Apenas o botão de Compartilhar agora */}
                         <TouchableOpacity onPress={handleShare} style={styles.circleBtn}>
                             <Ionicons name="share-social-outline" size={22} color="#FFF" />
                         </TouchableOpacity>
                     </SafeAreaView>
 
-                    {/* Título e Empresa (Sobre a imagem) */}
                     <View style={styles.headerInfo}>
                         <View style={styles.companyBadge}>
                             <Image

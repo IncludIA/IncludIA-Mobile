@@ -1,37 +1,16 @@
-import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer } from '@react-navigation/native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import AppNavigator from './src/navigation/AppNavigation';
+import { StatusBar } from 'react-native';
 import { AuthProvider } from './src/context/AuthContext';
-import {
-  ThemeProvider,
-  useTheme,
-  AppLightTheme,
-  AppDarkTheme,
-} from './src/context/ThemeContext';
-
-const AppContent = () => {
-  const { theme, isDark } = useTheme();
-  const navigationTheme = theme === 'dark' ? AppDarkTheme : AppLightTheme;
-
-  return (
-    <NavigationContainer theme={navigationTheme}>
-      <AuthProvider>
-        <AppNavigator />
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-      </AuthProvider>
-    </NavigationContainer>
-  );
-};
+import { ThemeProvider } from './src/context/ThemeContext';
+import AppNavigation from './src/navigation/AppNavigation';
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <AuthProvider>
       <ThemeProvider>
-        <AppContent />
+        <StatusBar barStyle="default" />
+        <AppNavigation />
       </ThemeProvider>
-    </GestureHandlerRootView>
+    </AuthProvider>
   );
 }

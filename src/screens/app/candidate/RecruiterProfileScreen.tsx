@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import api from '../../services/api';
+import api from '../../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
 
 interface RecruiterProfile {
     id: string;

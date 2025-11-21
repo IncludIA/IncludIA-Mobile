@@ -5,8 +5,10 @@ import {
     Alert, Image, ActivityIndicator, Keyboard
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import api from '../../services/api';
+
+// --- CORREÇÃO DOS IMPORTES (Subindo 3 níveis) ---
+import { useTheme } from '../../../context/ThemeContext';
+import api from '../../../services/api';
 
 // --- INTERFACES ---
 interface Message {
@@ -94,7 +96,7 @@ export default function ChatMessageScreen({ route, navigation }: any) {
 
         const tempMsg: Message = {
             id: Date.now().toString(),
-            text: inputText.trim(), // Remove espaços extras nas pontas
+            text: inputText.trim(),
             senderId: 'me',
             timestamp: new Date().toISOString()
         };
@@ -102,7 +104,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
         setMessages(prev => [...prev, tempMsg]);
         setInputText('');
 
-        // Rola para o final imediatamente
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
         try {
@@ -145,12 +146,10 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                     isMe ? styles.bubbleMe : styles.bubbleThem,
                     { backgroundColor: isMe ? colors.primary : colors.card }
                 ]}>
-                    {/* Texto com suporte a quebra de linha */}
                     <Text style={[styles.messageText, { color: isMe ? '#FFF' : colors.text }]}>
                         {item.text}
                     </Text>
 
-                    {/* Hora pequena no canto */}
                     <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.4)' }]}>
                         {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
@@ -162,7 +161,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
-            {/* HEADER */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
@@ -187,23 +185,20 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                 </TouchableOpacity>
             </View>
 
-            {/* ÁREA DE CHAT + INPUT (KeyboardAvoidingView Otimizado) */}
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} // Ajuste se tiver Header Navigation Stack
             >
                 <FlatList
                     ref={flatListRef}
                     data={messages}
                     keyExtractor={item => item.id}
                     renderItem={renderMessageItem}
-                    contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
+                    contentContainerStyle={styles.listContent}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                     onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
 
-                {/* INPUT AREA */}
                 {isMatchActive ? (
                     <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
                         <TextInput
@@ -213,7 +208,7 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                             value={inputText}
                             onChangeText={setInputText}
                             multiline
-                            maxLength={500} // Limite razoável
+                            maxLength={500}
                         />
                         <TouchableOpacity
                             style={[styles.sendBtn, { backgroundColor: inputText.trim() ? colors.primary : '#CCC' }]}
@@ -230,7 +225,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                 )}
             </KeyboardAvoidingView>
 
-            {/* MODAL MENU */}
             <Modal visible={menuVisible} transparent animationType="fade">
                 <TouchableWithoutFeedback onPress={() => setMenuVisible(false)}>
                     <View style={styles.modalOverlay}>
@@ -256,8 +250,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-
-    // Header Fixo
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, zIndex: 10, elevation: 2 },
     backBtn: { padding: 8, marginRight: 8 },
     headerInfo: { flex: 1, flexDirection: 'row', alignItems: 'center' },
@@ -267,54 +259,23 @@ const styles = StyleSheet.create({
     headerName: { fontSize: 16, fontWeight: 'bold' },
     headerStatus: { fontSize: 12, color: '#34C759' },
     menuBtn: { padding: 8 },
-
-    // Datas
     dateBadgeContainer: { alignItems: 'center', marginVertical: 16 },
     dateBadge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, opacity: 0.6 },
     dateText: { fontSize: 11, fontWeight: '600' },
-
-    // Balões
     bubble: { maxWidth: '80%', padding: 12, borderRadius: 18, marginBottom: 4 },
     bubbleMe: { alignSelf: 'flex-end', borderBottomRightRadius: 2 },
     bubbleThem: { alignSelf: 'flex-start', borderBottomLeftRadius: 2 },
     messageText: { fontSize: 16, lineHeight: 22 },
     timeText: { fontSize: 10, alignSelf: 'flex-end', marginTop: 4, opacity: 0.8 },
-
-    // Input Flutuante
-    inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        paddingHorizontal: 16,
-        paddingVertical: 12, // Padding vertical confortável
-        borderTopWidth: 1,
-    },
-    input: {
-        flex: 1,
-        minHeight: 44,
-        maxHeight: 120,
-        borderRadius: 22,
-        paddingHorizontal: 16,
-        paddingTop: 12, // Importante para multiline centralizar
-        paddingBottom: 12,
-        marginRight: 12,
-        fontSize: 16
-    },
-    sendBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 0 // Alinhado com a base do input
-    },
-
+    inputWrapper: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1 },
+    input: { flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 22, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12, marginRight: 12, fontSize: 16 },
+    sendBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 0 },
     unmatchBox: { padding: 20, backgroundColor: '#FFE5E5', alignItems: 'center' },
     unmatchText: { color: '#FF3B30', fontWeight: 'bold' },
-
-    // Menu
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.2)' },
     menuBox: { position: 'absolute', top: 60, right: 16, width: 180, borderRadius: 12, paddingVertical: 8, elevation: 5 },
     menuOption: { paddingVertical: 12, paddingHorizontal: 16 },
     menuText: { fontSize: 16 },
-    divider: { height: 1, marginVertical: 4 }
+    divider: { height: 1, marginVertical: 4 },
+    listContent: { paddingBottom: 20, paddingTop: 10 }
 });

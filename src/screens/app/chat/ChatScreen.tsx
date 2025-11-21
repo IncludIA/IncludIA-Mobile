@@ -4,8 +4,8 @@ import {
     TextInput, SafeAreaView, StatusBar, RefreshControl
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import api from '../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
+import api from '../../../services/api';
 
 // --- INTERFACES ---
 interface ChatPreview {
