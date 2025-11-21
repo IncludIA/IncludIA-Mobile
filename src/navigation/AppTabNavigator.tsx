@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 import HomeScreen from '../screens/app/HomeScreen';
 import MatchesScreen from '../screens/app/MatchesScreen';
@@ -50,9 +51,13 @@ const HomeNavigator = () => (
 const MatchesStack = createNativeStackNavigator<MatchesStackParamList>();
 const MatchesNavigator = () => (
     <MatchesStack.Navigator>
-        <MatchesStack.Screen name="Matches" component={MatchesScreen} />
+        <MatchesStack.Screen
+            name="Matches"
+            component={MatchesScreen}
+            options={{ title: 'Curtidas' }}
+        />
     </MatchesStack.Navigator>
-);
+)
 
 const ChatStack = createNativeStackNavigator<ChatStackParamList>();
 const ChatNavigator = () => (
@@ -115,7 +120,27 @@ export default function AppTabNavigator() {
         >
             <Tab.Screen name="HomeStack" component={HomeNavigator} options={{ title: 'Home' }} />
             <Tab.Screen name="MatchesStack" component={MatchesNavigator} options={{ title: 'Matches' }} />
-            <Tab.Screen name="ChatStack" component={ChatNavigator} options={{ title: 'Conversas' }} />
+
+            <Tab.Screen
+                name="ChatStack"
+                component={ChatNavigator}
+                options={({ route }) => ({
+                    title: 'Conversas',
+                    tabBarStyle: ((route) => {
+                        const routeName = getFocusedRouteNameFromRoute(route) ?? 'ChatList';
+
+                        if (routeName === 'ChatMessage') {
+                            return { display: 'none' };
+                        }
+
+                        return {
+                            backgroundColor: isDark ? colors.card : colors.background,
+                            borderTopColor: colors.border,
+                        };
+                    })(route),
+                })}
+            />
+
             <Tab.Screen name="ProfileStack" component={ProfileNavigator} options={{ title: 'Perfil' }} />
         </Tab.Navigator>
     );

@@ -2,16 +2,13 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 
-// Importe o novo navegador de Abas
 import AppTabNavigator from './AppTabNavigator';
 
-// Importe apenas as telas de Auth e Splash
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import SplashScreen from '../screens/app/SplashScreen';
 import WelcomeScreen from '../screens/auth/WelcomeScreen';
 
-// --- DEFINIÇÃO DE TIPOS ---
 
 export type AuthStackParamList = {
     Welcome: undefined;
