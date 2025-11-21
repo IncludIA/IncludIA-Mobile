@@ -1,14 +1,43 @@
+# 🧠 Includ.IA - Cognitive Engine (Microserviço de IA)
 
-# 🚀 Includ.IA - Mobile
+> 🚀 **Global Solution 2025 - O Futuro do Trabalho**
+>
+> 🎓 *Disruptive Architectures: *Mobile*
 
-> **O Futuro do Trabalho é Inclusivo.**
-
-![Banner](https://via.placeholder.com/1200x300?text=Includ.IA+Mobile+App)
+<div align="center">
 
 ![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
+
+</div>
+---
+
+## 📑 Índice
+
+1.  [🌐 Links e Demonstração](#-links-e-demonstração)
+2.  [💡 Sobre o Projeto](#-sobre-o-projeto)
+3.  [📱 Funcionalidades e Telas](#-funcionalidades-e-telas)
+    * [Fluxo de Autenticação](#-fluxo-de-autenticação)
+    * [Área do Candidato](#-área-do-candidato)
+    * [Área do Recrutador](#-área-do-recrutador)
+    * [Funcionalidades Comuns](#-funcionalidades-comuns)
+4.  [🛠 Arquitetura e Tecnologias](#-arquitetura-e-tecnologias)
+5.  [🚀 Como Rodar o Projeto](#-como-rodar-o-projeto)
+6.  [👥 Integrantes](#-integrantes)
+7.  [📄 Licença](#-licença)
+
+---
+
+## 🌐 Links e Demonstração
+
+<div align="center">
+
+[![Pitch](https://img.shields.io/badge/🎬%20Vídeo-Pitch-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/SEU_LINK_PITCH)
+[![Demo](https://img.shields.io/badge/📺%20Demo-Técnica-212121?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/SEU_LINK_DEMO)
+
+</div>
 
 ---
 
@@ -20,30 +49,41 @@ O aplicativo móvel oferece uma experiência **Dual Persona** (B2C e B2B), conec
 
 ---
 
-## 📱 Funcionalidades
+## 📱 Funcionalidades e Telas
 
-O aplicativo adapta-se automaticamente dependendo do tipo de usuário logado:
+O aplicativo adapta-se automaticamente dependendo do tipo de usuário logado (Candidato ou Recrutador).
 
-### 👤 Para Candidatos
-* **Gamificação de Perfil:** Barra de progresso que incentiva o preenchimento completo do currículo.
-* **Feed de Vagas (Swipe):** Interface intuitiva estilo "Tinder" para aplicar ou descartar vagas.
-* **Smart Match:** Algoritmo que calcula a % de compatibilidade baseada em Skills.
-* **Chat em Tempo Real:** Comunicação direta com recrutadores após o Match.
-* **IA Profile:** Resumo de perfil gerado por IA focado em *soft skills*.
+### 🔐 Fluxo de Autenticação
+* **Welcome Screen:** Tela de boas-vindas animada com a proposta de valor.
+* **Login:** Acesso seguro com JWT. Possui botões de **Demo Rápido** para testar como Candidato ou Recrutador sem cadastro.
+* **Cadastro:** Fluxo inteligente onde o usuário escolhe seu perfil. Se for recrutador, o sistema cria automaticamente uma empresa para facilitar o teste.
 
-### 💼 Para Recrutadores
-* **Dashboard de Gestão:** Visão geral das vagas abertas, candidatos e métricas.
-* **Publicação de Vagas:** Formulário assistido por IA para descrições inclusivas.
-* **Feed de Talentos:** Busca ativa de candidatos compatíveis com a vaga.
-* **Análise de Perfil:** Visualização estruturada de currículos.
+### 👤 Área do Candidato
+Focada na experiência do usuário que busca emprego.
+* **Home (Feed de Vagas):** Interface estilo "Swipe" (Tinder). O candidato vê cards de vagas compatíveis, pode dar Like (candidatar-se) ou Dislike.
+* **Detalhes da Vaga:** Tela rica com descrição, benefícios, salário e análise de compatibilidade gerada por IA.
+* **Perfil Pessoal Gamificado:** Uma barra de progresso incentiva o preenchimento completo do currículo (Skills, Experiência, Educação).
+* **Edição de Perfil:** Interface intuitiva para adicionar habilidades (tags), experiências e resumo profissional.
+
+### 💼 Área do Recrutador
+Focada na gestão de processos seletivos.
+* **Dashboard:** Visão geral das vagas abertas, número de candidatos e matches.
+* **Publicar Vaga:** Formulário assistido para criar novas oportunidades.
+* **Feed de Talentos:** O recrutador vê candidatos compatíveis com sua vaga e pode dar "Match".
+* **Perfil do Candidato:** Visualização do currículo do candidato (com opção de anonimização inicial).
+* **Perfil da Empresa:** Gestão da marca empregadora (Cultura, Descrição).
 
 ### ⚙️ Funcionalidades Comuns
-* **Segurança:** Autenticação JWT, Proteção de Rotas e LGPD (Solicitação de Dados e Exclusão de Conta).
-* **Configurações:** Modo Escuro/Claro, Notificações e Privacidade.
+* **Matches:** Lista de conexões bem-sucedidas.
+* **Chat em Tempo Real:** Troca de mensagens entre candidato e recrutador após o Match.
+* **Configurações:**
+    * **LGPD:** Solicitação de exportação de dados.
+    * **Segurança:** Alteração de senha, Exclusão de conta e 2FA (Simulado).
+    * **Jurídico:** Termos de Uso e Políticas de Privacidade.
 
 ---
 
-## 🛠 Tecnologias & Arquitetura
+## 🛠 Arquitetura e Tecnologias
 
 O projeto foi construído seguindo os princípios de **Clean Architecture** e **Solid**, garantindo escalabilidade.
 
@@ -108,17 +148,13 @@ src/
       * Pressione `i` para abrir no iOS Simulator.
       * Ou escaneie o QR Code com o app **Expo Go** no seu celular.
 
------
-
-## 🎥 Demonstração
-
-Confira o vídeo completo da solução em funcionamento:
-
-[](https://www.google.com/search?q=https://www.youtube.com/watch%3Fv%3DVIDEO_ID_AQUI)
-
-*(Clique na imagem para assistir)*
 
 -----
 
-## 👥 Integrantes do Grupo
+
+## 👥 Integrantes
+
+  * **RM 555213** - Luiz Eduardo Da Silva Pinto
+
+
 
