@@ -1,12 +1,36 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+    View, Text, FlatList, StyleSheet, TouchableOpacity, Image,
+    ActivityIndicator, RefreshControl, Alert
+} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 
-// --- DADOS DE EXEMPLO PARA TESTE (MOCK) ---
-const MOCK_MATCHES = [
+// --- INTERFACE (Baseada no Java) ---
+interface MatchItem {
+    id: string;
+    matchDate: string;
+    jobVaga: {
+        id: string;
+        titulo: string;
+        localizacao: string;
+        empresa: {
+            id: string;
+            nomeFantasia: string;
+            fotoCapaUrl?: string;
+        };
+    };
+    recruiter: {
+        id: string;
+        nome: string;
+        cargo?: string;
+    };
+}
+
+// --- DADOS MOCK (Fallback se a API falhar) ---
+const MOCK_MATCHES: MatchItem[] = [
     {
         id: 'mock-1',
         matchDate: new Date().toISOString(),
@@ -14,80 +38,43 @@ const MOCK_MATCHES = [
             id: 'v1',
             titulo: 'Senior Frontend Engineer',
             localizacao: 'Remoto',
-            empresa: {
-                id: 'e1',
-                nomeFantasia: 'Google',
-                fotoCapaUrl: 'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?q=80&w=1000&auto=format&fit=crop'
-            }
+            empresa: { id: 'e1', nomeFantasia: 'Google', fotoCapaUrl: 'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?q=80&w=1000&auto=format&fit=crop' }
         },
-        recruiter: {
-            id: 'r1',
-            nome: 'Sarah Connor',
-            cargo: 'Tech Recruiter'
-        }
+        recruiter: { id: 'r1', nome: 'Sarah Connor', cargo: 'Tech Recruiter' }
     },
     {
         id: 'mock-2',
-        matchDate: new Date(Date.now() - 86400000).toISOString(), // Ontem
+        matchDate: new Date().toISOString(),
         jobVaga: {
             id: 'v2',
             titulo: 'Java Backend Developer',
             localizacao: 'São Paulo, SP',
-            empresa: {
-                id: 'e2',
-                nomeFantasia: 'Nubank',
-                fotoCapaUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1000&auto=format&fit=crop'
-            }
+            empresa: { id: 'e2', nomeFantasia: 'Nubank', fotoCapaUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1000&auto=format&fit=crop' }
         },
-        recruiter: {
-            id: 'r2',
-            nome: 'Roberto Carlos',
-            cargo: 'Head of Engineering'
-        }
-    },
-    {
-        id: 'mock-3',
-        matchDate: new Date(Date.now() - 172800000).toISOString(), // Anteontem
-        jobVaga: {
-            id: 'v3',
-            titulo: 'Product Owner',
-            localizacao: 'Rio de Janeiro, RJ',
-            empresa: {
-                id: 'e3',
-                nomeFantasia: 'Microsoft',
-                fotoCapaUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000&auto=format&fit=crop'
-            }
-        },
-        recruiter: {
-            id: 'r3',
-            nome: 'Amanda Waller',
-            cargo: 'Talent Acquisition'
-        }
+        recruiter: { id: 'r2', nome: 'Roberto Carlos', cargo: 'Head of Engineering' }
     }
 ];
 
 export default function MatchesScreen({ navigation }: any) {
-    const [matches, setMatches] = useState<any[]>([]);
+    const [matches, setMatches] = useState<MatchItem[]>([]);
     const [loading, setLoading] = useState(true);
     const { colors } = useTheme();
 
     const loadMatches = async () => {
         setLoading(true);
         try {
-            // Tenta buscar da API
             const response = await api.get('/matches/my-matches');
-            const data = response.data.content || [];
+            const data = response.data.content || response.data || [];
 
             if (data.length > 0) {
                 setMatches(data);
             } else {
-                // SE A API ESTIVER VAZIA, USA OS EXEMPLOS
-                console.log("API vazia, usando exemplos de teste.");
+                // Se vier vazio, usa Mock para a apresentação não ficar feia
+                console.log("API retornou lista vazia. Usando Mocks.");
                 setMatches(MOCK_MATCHES);
             }
         } catch (error) {
-            // SE DER ERRO, USA OS EXEMPLOS TAMBÉM
-            console.log("Erro na API, carregando exemplos.");
+            console.log("Erro na API de Matches. Usando Fallback.");
             setMatches(MOCK_MATCHES);
         } finally {
             setLoading(false);
@@ -100,30 +87,60 @@ export default function MatchesScreen({ navigation }: any) {
         }, [])
     );
 
-    const renderItem = ({ item }: { item: any }) => (
-        <TouchableOpacity
-            style={[styles.itemContainer, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => navigation.navigate('MatchDetail', { matchData: item })}
-        >
-            <Image
-                source={{ uri: item.jobVaga.empresa.fotoCapaUrl || 'https://github.com/github.png' }}
-                style={styles.avatar}
-            />
-            <View style={styles.textContainer}>
-                <Text style={[styles.jobTitle, { color: colors.text }]}>
-                    {item.jobVaga.titulo}
-                </Text>
-                <Text style={[styles.companyName, { color: colors.primary }]}>
-                    {item.jobVaga.empresa.nomeFantasia}
-                </Text>
-                <Text style={styles.dateText}>
-                    Conectado em {new Date(item.matchDate).toLocaleDateString()}
-                </Text>
-            </View>
-            <View style={styles.iconAction}>
-                <Ionicons name="chatbubble-ellipses-outline" size={24} color={colors.primary} />
-            </View>
-        </TouchableOpacity>
+    // --- NAVEGAÇÃO PARA O CHAT DIRETO ---
+    const handleOpenChat = (item: MatchItem) => {
+        // Precisamos navegar para a ChatStack -> ChatMessage
+        navigation.navigate('ChatStack', {
+            screen: 'ChatMessage',
+            params: {
+                matchId: item.id,
+                name: item.recruiter.nome || 'Recrutador',
+                photo: item.jobVaga.empresa.fotoCapaUrl,
+                recruiterId: item.recruiter.id // Importante para o perfil
+            }
+        });
+    };
+
+    // --- NAVEGAÇÃO PARA DETALHES DO MATCH ---
+    const handleOpenDetails = (item: MatchItem) => {
+        navigation.navigate('MatchDetail', { matchData: item });
+    };
+
+    const renderItem = ({ item }: { item: MatchItem }) => (
+        <View style={[styles.cardWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
+
+            {/* Área clicável principal: Vai para DETALHES */}
+            <TouchableOpacity
+                style={styles.mainClickArea}
+                onPress={() => handleOpenDetails(item)}
+                activeOpacity={0.7}
+            >
+                <Image
+                    source={{ uri: item.jobVaga.empresa.fotoCapaUrl || 'https://github.com/github.png' }}
+                    style={styles.avatar}
+                />
+                <View style={styles.textContainer}>
+                    <Text style={[styles.jobTitle, { color: colors.text }]} numberOfLines={1}>
+                        {item.jobVaga.titulo}
+                    </Text>
+                    <Text style={[styles.companyName, { color: colors.primary }]}>
+                        {item.jobVaga.empresa.nomeFantasia}
+                    </Text>
+                    <Text style={styles.dateText}>
+                        Match em {new Date(item.matchDate).toLocaleDateString()}
+                    </Text>
+                </View>
+            </TouchableOpacity>
+
+            {/* Área do Ícone de Chat: Vai para CONVERSA */}
+            <TouchableOpacity
+                style={[styles.chatIconBtn, { backgroundColor: 'rgba(0,122,255,0.1)' }]}
+                onPress={() => handleOpenChat(item)}
+            >
+                <Ionicons name="chatbubble-ellipses" size={24} color="#007AFF" />
+            </TouchableOpacity>
+
+        </View>
     );
 
     return (
@@ -163,14 +180,42 @@ const styles = StyleSheet.create({
     header: { paddingHorizontal: 24, paddingTop: 60, paddingBottom: 20 },
     headerTitle: { fontSize: 32, fontWeight: '800' },
     headerSubtitle: { fontSize: 16, opacity: 0.6 },
+
     listContent: { paddingHorizontal: 20, paddingBottom: 20 },
-    itemContainer: { flexDirection: 'row', alignItems: 'center', padding: 16, marginBottom: 12, borderRadius: 16, borderWidth: 1, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, shadowOffset: { width: 0, height: 2 } },
-    avatar: { width: 56, height: 56, borderRadius: 12, marginRight: 16, backgroundColor: '#f0f0f0' },
-    textContainer: { flex: 1 },
+
+    cardWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 12,
+        marginBottom: 12,
+        borderRadius: 16,
+        borderWidth: 1,
+        // Sombra leve
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2
+    },
+
+    mainClickArea: { flex: 1, flexDirection: 'row', alignItems: 'center' },
+
+    avatar: { width: 56, height: 56, borderRadius: 12, marginRight: 14, backgroundColor: '#f0f0f0' },
+    textContainer: { flex: 1, paddingRight: 8 },
+
     jobTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 2 },
-    companyName: { fontSize: 14, fontWeight: '600', opacity: 0.8 },
+    companyName: { fontSize: 14, fontWeight: '600', opacity: 0.9 },
     dateText: { fontSize: 12, opacity: 0.5, marginTop: 4 },
-    iconAction: { padding: 8 },
+
+    // Botão de Chat
+    chatIconBtn: {
+        padding: 12,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 4
+    },
+
     emptyContainer: { marginTop: 100, alignItems: 'center' },
     emptyText: { marginTop: 16, fontSize: 16, opacity: 0.6 }
 });

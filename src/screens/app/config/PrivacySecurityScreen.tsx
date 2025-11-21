@@ -49,7 +49,11 @@ export default function PrivacySecurityScreen({ navigation }: any) {
                     onPress={() => navigation.navigate('LgpdRequest')}
                 />
 
-                <MenuItem icon="eye-off-outline" label="Visibilidade do Perfil" />
+                <MenuItem
+                    icon="eye-outline"
+                    label="Visibilidade do Perfil"
+                    onPress={() => navigation.navigate('Visibility')}
+                />
 
                 <TouchableOpacity
                     style={[styles.deleteBtn, { backgroundColor: 'rgba(255,59,48,0.1)' }]}

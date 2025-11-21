@@ -64,14 +64,12 @@ export default function ChatScreen({ navigation }: any) {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Helper para pegar iniciais (Ex: Sarah Connor -> SC)
     const getInitials = (name: string) => {
         const names = name.trim().split(' ');
         if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
         return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
     };
 
-    // Helper de formatação de tempo
     const formatTime = (isoString: string) => {
         const date = new Date(isoString);
         const now = new Date();
@@ -108,15 +106,12 @@ export default function ChatScreen({ navigation }: any) {
         loadChats();
     }, [loadChats]);
 
-    // Lógica de "Marcar como Lido"
     const handleOpenChat = (chat: ChatPreview) => {
-        // 1. Atualiza visualmente para "Lido" (zera contador e remove destaque)
         const updatedChats = chats.map(c =>
             c.id === chat.id ? { ...c, unreadCount: 0 } : c
         );
         setChats(updatedChats);
 
-        // 2. Navega para a conversa
         navigation.navigate('ChatMessage', {
             matchId: chat.id,
             name: chat.recipientName
@@ -197,9 +192,6 @@ export default function ChatScreen({ navigation }: any) {
 
             <View style={[styles.header, { backgroundColor: colors.background }]}>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Mensagens</Text>
-                <TouchableOpacity>
-                    <Ionicons name="create-outline" size={28} color={colors.primary} />
-                </TouchableOpacity>
             </View>
 
             <View style={styles.searchContainer}>

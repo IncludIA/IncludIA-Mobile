@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity,
-    KeyboardAvoidingView, Platform, SafeAreaView, Modal, TouchableWithoutFeedback, Alert, Image
+    KeyboardAvoidingView, Platform, SafeAreaView, Modal, TouchableWithoutFeedback, Alert, Image, ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
@@ -15,103 +15,122 @@ interface Message {
     timestamp: string; // ISO String
 }
 
-// --- MOCKS PARA DEMONSTRAÇÃO ---
+// --- MOCKS PARA FALHA DE API ---
 const MOCK_MESSAGES: Message[] = [
-    { id: '1', text: 'Olá! Vi seu perfil e achei muito interessante.', senderId: 'other', timestamp: new Date(Date.now() - 172800000).toISOString() }, // 2 dias atrás
-    { id: '2', text: 'Oi! Muito obrigado. Fiquei interessado na vaga.', senderId: 'me', timestamp: new Date(Date.now() - 86400000).toISOString() }, // Ontem
-    { id: '3', text: 'Podemos marcar uma conversa rápida?', senderId: 'other', timestamp: new Date(Date.now() - 86000000).toISOString() }, // Ontem
-    { id: '4', text: 'Claro! Hoje à tarde fica bom?', senderId: 'me', timestamp: new Date().toISOString() }, // Hoje
+    { id: '1', text: 'Olá! Vi seu perfil e achei muito interessante.', senderId: 'other', timestamp: new Date(Date.now() - 172800000).toISOString() },
+    { id: '2', text: 'Oi! Muito obrigado. Fiquei interessado na vaga.', senderId: 'me', timestamp: new Date(Date.now() - 86400000).toISOString() },
+    { id: '3', text: 'Podemos marcar uma conversa rápida?', senderId: 'other', timestamp: new Date(Date.now() - 3600000).toISOString() },
 ];
 
 export default function ChatMessageScreen({ route, navigation }: any) {
-    const { matchId, name, photo, recruiterId } = route.params; // Recebe dados da navegação
+    const { matchId, name, photo, recruiterId } = route.params;
     const { colors } = useTheme();
 
-    const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState('');
-    const [isMatchActive, setIsMatchActive] = useState(true); // Controla se o match ainda existe
-    const [menuVisible, setMenuVisible] = useState(false); // Controla o menu de 3 pontinhos
+    const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const [menuVisible, setMenuVisible] = useState(false);
+    const [isMatchActive, setIsMatchActive] = useState(true);
 
     const flatListRef = useRef<FlatList>(null);
 
-    // Rola para o fim ao entrar
+    // --- CARREGAR MENSAGENS ---
     useEffect(() => {
-        setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+        loadMessages();
     }, []);
+
+    const loadMessages = async () => {
+        try {
+            // Tenta buscar da API Real
+            const response = await api.get(`/chats/${matchId}/messages`);
+            if (response.data && response.data.length > 0) {
+                setMessages(response.data);
+            } else {
+                setMessages(MOCK_MESSAGES); // Se vazio, usa mock para demo
+            }
+        } catch (error) {
+            console.log("Erro ao carregar chat, usando mock.");
+            setMessages(MOCK_MESSAGES);
+        } finally {
+            setLoading(false);
+            // Rola para o final após carregar
+            setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 100);
+        }
+    };
+
+    // --- FUNÇÃO DE INICIAIS ---
+    const getInitials = (fullName: string) => {
+        if (!fullName) return "?";
+        const names = fullName.trim().split(' ');
+        if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
+        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    };
 
     // --- LÓGICA DE DATAS ---
     const getDateLabel = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
-
-        const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
+        const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth();
+        const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+        const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth();
 
         if (isToday) return 'Hoje';
         if (isYesterday) return 'Ontem';
-        return date.toLocaleDateString('pt-BR'); // Ex: 20/11/2024
+        return date.toLocaleDateString('pt-BR');
     };
 
     const shouldShowDateHeader = (currentIndex: number) => {
-        if (currentIndex === 0) return true; // Primeira msg sempre tem data
-
+        if (currentIndex === 0) return true;
         const currentDate = new Date(messages[currentIndex].timestamp).toDateString();
         const prevDate = new Date(messages[currentIndex - 1].timestamp).toDateString();
-
         return currentDate !== prevDate;
     };
 
-    // --- AÇÕES ---
-    const handleSend = () => {
+    // --- ENVIAR MENSAGEM ---
+    const handleSend = async () => {
         if (!inputText.trim()) return;
 
-        const newMsg: Message = {
+        const tempMsg: Message = {
             id: Date.now().toString(),
             text: inputText,
             senderId: 'me',
             timestamp: new Date().toISOString()
         };
 
-        setMessages([...messages, newMsg]);
+        // Atualiza UI imediatamente (Otimista)
+        setMessages(prev => [...prev, tempMsg]);
         setInputText('');
+        setSending(true);
+
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-    };
 
-    const handleAction = (action: 'UNMATCH' | 'REPORT' | 'BLOCK') => {
-        setMenuVisible(false);
-
-        if (action === 'UNMATCH') {
-            Alert.alert(
-                "Desfazer Match?",
-                "Você não poderá mais enviar mensagens para este recrutador. Essa ação não pode ser desfeita.",
-                [
-                    { text: "Cancelar", style: "cancel" },
-                    {
-                        text: "Sim, desfazer",
-                        style: 'destructive',
-                        onPress: () => {
-                            // Aqui chamaria a API: api.post(`/matches/${matchId}/unmatch`)
-                            setIsMatchActive(false);
-                        }
-                    }
-                ]
-            );
-        } else if (action === 'REPORT') {
-            Alert.alert("Denúncia Enviada", "Analisaremos as mensagens desta conversa.");
-        } else {
-            Alert.alert("Bloqueado", "Este usuário foi bloqueado.");
-            setIsMatchActive(false);
+        try {
+            // Envia para API
+            await api.post(`/chats/${matchId}/messages`, { text: tempMsg.text });
+        } catch (error) {
+            console.log("Erro ao enviar mensagem (API offline?)");
+        } finally {
+            setSending(false);
         }
     };
 
-    const handleGoToProfile = () => {
-        const targetId = recruiterId || 'mock-recruiter-id';
-        navigation.navigate('RecruiterProfile', {
-            recruiterId: targetId,
-            name: name
-        });
+    // --- AÇÕES DO MENU ---
+    const handleAction = (action: 'PROFILE' | 'REPORT' | 'UNMATCH') => {
+        setMenuVisible(false);
+        if (action === 'PROFILE') {
+            navigation.navigate('RecruiterProfile', {
+                recruiterId: recruiterId || 'mock',
+                name: name
+            });
+        } else if (action === 'UNMATCH') {
+            Alert.alert("Desfazer Match", "Tem certeza? A conversa sumirá.", [
+                { text: "Cancelar", style: "cancel" },
+                { text: "Desfazer", style: "destructive", onPress: () => setIsMatchActive(false) }
+            ]);
+        } else {
+            Alert.alert("Denúncia", "Recebemos sua denúncia e analisaremos a conversa.");
+        }
     };
 
     const renderMessageItem = ({ item, index }: { item: Message, index: number }) => {
@@ -127,19 +146,15 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                         </View>
                     </View>
                 )}
-
                 <View style={[
                     styles.bubble,
                     isMe ? styles.bubbleMe : styles.bubbleThem,
                     { backgroundColor: isMe ? colors.primary : colors.card }
                 ]}>
-                    <Text style={{ color: isMe ? '#FFF' : colors.text, fontSize: 16 }}>
+                    <Text style={{ color: isMe ? '#FFF' : colors.text, fontSize: 16, lineHeight: 22 }}>
                         {item.text}
                     </Text>
-                    <Text style={[
-                        styles.timeText,
-                        { color: isMe ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.4)' }
-                    ]}>
+                    <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.4)' }]}>
                         {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                 </View>
@@ -150,23 +165,24 @@ export default function ChatMessageScreen({ route, navigation }: any) {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
-            {/* HEADER CUSTOMIZADO */}
+            {/* HEADER */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.headerInfo} onPress={handleGoToProfile} activeOpacity={0.7}>
+                <TouchableOpacity style={styles.headerInfo} onPress={() => handleAction('PROFILE')}>
+                    {/* Lógica de Avatar ou Letras */}
                     {photo ? (
                         <Image source={{ uri: photo }} style={styles.headerAvatar} />
                     ) : (
                         <View style={[styles.headerAvatarFallback, { backgroundColor: colors.primary }]}>
-                            <Text style={{ color: '#FFF', fontWeight: 'bold' }}>{name?.charAt(0)}</Text>
+                            <Text style={styles.avatarText}>{getInitials(name)}</Text>
                         </View>
                     )}
                     <View>
                         <Text style={[styles.headerName, { color: colors.text }]}>{name}</Text>
-                        {isMatchActive && <Text style={styles.headerStatus}>Toque para ver perfil</Text>}
+                        {isMatchActive && <Text style={styles.headerStatus}>Online agora</Text>}
                     </View>
                 </TouchableOpacity>
 
@@ -175,20 +191,27 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                 </TouchableOpacity>
             </View>
 
-            <FlatList
-                ref={flatListRef}
-                data={messages}
-                keyExtractor={item => item.id}
-                renderItem={renderMessageItem}
-                contentContainerStyle={styles.listContent}
-            />
+            {/* ÁREA DE MENSAGENS */}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={{ flex: 1 }}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0} // Ajuste fino para iOS
+            >
+                <FlatList
+                    ref={flatListRef}
+                    data={messages}
+                    keyExtractor={item => item.id}
+                    renderItem={renderMessageItem}
+                    contentContainerStyle={styles.listContent}
+                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                />
 
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}>
+                {/* INPUT FLUTUANTE SOBRE O TECLADO */}
                 {isMatchActive ? (
                     <View style={[styles.inputContainer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
                         <TextInput
                             style={[styles.input, { color: colors.text, backgroundColor: colors.background }]}
-                            placeholder="Digite uma mensagem..."
+                            placeholder="Digite sua mensagem..."
                             placeholderTextColor="#999"
                             value={inputText}
                             onChangeText={setInputText}
@@ -199,24 +222,22 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                             onPress={handleSend}
                             disabled={!inputText.trim()}
                         >
-                            <Ionicons name="send" size={20} color="#FFF" />
+                            {sending ? <ActivityIndicator size="small" color="#FFF" /> : <Ionicons name="send" size={18} color="#FFF" />}
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    <View style={styles.unmatchContainer}>
-                        <Ionicons name="heart-dislike" size={24} color="#FF3B30" />
-                        <Text style={styles.unmatchText}>
-                            O match foi desfeito. Vocês não podem mais conversar.
-                        </Text>
+                    <View style={styles.unmatchBox}>
+                        <Text style={styles.unmatchText}>Você não pode mais responder a esta conversa.</Text>
                     </View>
                 )}
             </KeyboardAvoidingView>
 
+            {/* MODAL MENU */}
             <Modal visible={menuVisible} transparent animationType="fade">
                 <TouchableWithoutFeedback onPress={() => setMenuVisible(false)}>
                     <View style={styles.modalOverlay}>
                         <View style={[styles.menuBox, { backgroundColor: colors.card }]}>
-                            <TouchableOpacity style={styles.menuOption} onPress={handleGoToProfile}>
+                            <TouchableOpacity style={styles.menuOption} onPress={() => handleAction('PROFILE')}>
                                 <Ionicons name="person-circle-outline" size={20} color={colors.text} />
                                 <Text style={[styles.menuText, { color: colors.text }]}>Ver Perfil</Text>
                             </TouchableOpacity>
@@ -242,39 +263,41 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
 
     // Header
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, zIndex: 10 },
-    backBtn: { marginRight: 12 },
+    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 } },
+    backBtn: { marginRight: 12, padding: 4 },
     headerInfo: { flex: 1, flexDirection: 'row', alignItems: 'center' },
+
     headerAvatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
     headerAvatarFallback: { width: 40, height: 40, borderRadius: 20, marginRight: 10, justifyContent: 'center', alignItems: 'center' },
+    avatarText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+
     headerName: { fontSize: 16, fontWeight: 'bold' },
-    headerStatus: { fontSize: 12, color: '#34C759' },
+    headerStatus: { fontSize: 12, color: '#34C759', fontWeight: '500' },
     menuBtn: { padding: 8 },
 
     // Lista
-    listContent: { paddingHorizontal: 16, paddingVertical: 20 },
+    listContent: { paddingHorizontal: 16, paddingVertical: 20, paddingBottom: 10 },
 
-    // Datas
+    // Data
     dateHeaderContainer: { alignItems: 'center', marginBottom: 16, marginTop: 8 },
     dateBadge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, opacity: 0.8 },
-    dateText: { fontSize: 12, fontWeight: '600', opacity: 0.7 },
+    dateText: { fontSize: 11, fontWeight: '600', opacity: 0.7 },
 
     // Balões
-    bubble: { maxWidth: '80%', padding: 12, borderRadius: 16, marginBottom: 8 },
-    bubbleMe: { alignSelf: 'flex-end', borderBottomRightRadius: 2 },
-    bubbleThem: { alignSelf: 'flex-start', borderBottomLeftRadius: 2 },
-    timeText: { fontSize: 10, alignSelf: 'flex-end', marginTop: 4 },
+    bubble: { maxWidth: '80%', padding: 12, borderRadius: 18, marginBottom: 8 },
+    bubbleMe: { alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+    bubbleThem: { alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
+    timeText: { fontSize: 10, alignSelf: 'flex-end', marginTop: 4, opacity: 0.8 },
 
     // Input
-    inputContainer: { flexDirection: 'row', padding: 10, borderTopWidth: 1, alignItems: 'flex-end' },
-    input: { flex: 1, minHeight: 40, maxHeight: 100, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, marginRight: 10 },
-    sendBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 2 }, // Ajuste fino para alinhar com multiline
+    inputContainer: { flexDirection: 'row', padding: 12, borderTopWidth: 1, alignItems: 'flex-end' },
+    input: { flex: 1, minHeight: 40, maxHeight: 120, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, marginRight: 10, fontSize: 16 },
+    sendBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 2 },
 
-    // Unmatch Banner
-    unmatchContainer: { backgroundColor: '#FFE5E5', padding: 20, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10 },
-    unmatchText: { color: '#FF3B30', fontWeight: 'bold', fontSize: 14, flex: 1, textAlign: 'center' },
+    unmatchBox: { padding: 20, backgroundColor: '#FFE5E5', alignItems: 'center' },
+    unmatchText: { color: '#FF3B30', fontWeight: 'bold' },
 
-    // Modal Menu
+    // Menu Modal
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.2)' },
     menuBox: { position: 'absolute', top: 60, right: 16, width: 200, borderRadius: 12, paddingVertical: 8, elevation: 5, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5 },
     menuOption: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16, gap: 12 },

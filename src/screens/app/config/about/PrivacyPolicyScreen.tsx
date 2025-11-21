@@ -61,7 +61,7 @@ export default function PrivacyPolicyScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' },
+    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)', },
     title: { fontSize: 18, fontWeight: 'bold' },
     content: { padding: 24 },
     intro: { fontSize: 14, fontStyle: 'italic', marginBottom: 24, opacity: 0.7, lineHeight: 20 },

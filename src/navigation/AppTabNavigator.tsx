@@ -12,11 +12,11 @@ import RecruiterProfileScreen from '../screens/app/RecruiterProfileScreen';
 import CompanyProfileScreen from '../screens/app/CompanyProfileScreen';
 import ChatScreen from '../screens/app/ChatScreen';
 import ChatMessageScreen from '../screens/app/ChatMessageScreen';
-import ProfileScreen from '../screens/app/PersonalProfileScreen'; // Seu perfil pessoal
+import PersonalProfileScreen from '../screens/app/PersonalProfileScreen';
 
 // Importação das Telas de Configuração
-import EditProfileScreen from '../screens/app/config/EditProfileScreen';
 import ConfigAppScreen from '../screens/app/config/ConfigAppScreen';
+import EditProfileScreen from '../screens/app/config/EditProfileScreen';
 import NotificationScreen from '../screens/app/config/NotificationScreen';
 import PrivacySecurityScreen from '../screens/app/config/PrivacySecurityScreen';
 import HelpSupportScreen from '../screens/app/config/HelpSupportScreen';
@@ -26,26 +26,12 @@ import DeleteProfileScreen from '../screens/app/config/privacy/DeleteProfileScre
 import ChangePasswordScreen from '../screens/app/config/privacy/ChangePasswordScreen';
 import LgpdRequestScreen from '../screens/app/config/privacy/LgpdRequestScreen';
 import TwoFactorScreen from '../screens/app/config/privacy/TwoFactorScreen';
+import VisibilityScreen from '../screens/app/config/privacy/VisibilityScreen';
+import TermsOfUseScreen from '../screens/app/config/about/TermsOfUseScreen';
+import PrivacyPolicyScreen from '../screens/app/config/about/PrivacyPolicyScreen';
+import JobDetailsScreen from '../screens/app/JobDetailsScreen';
 
-
-export type HomeStackParamList = {
-    Home: undefined;
-};
-
-export type MatchStackParamList = {
-    MatchesList: undefined;
-    MatchDetail: { matchData: any };
-    RecruiterProfile: { recruiterId: string; name: string };
-    CompanyProfile: { companyData: any };
-};
-
-export type ChatStackParamList = {
-    ChatList: undefined;
-    ChatMessage: { matchId: string; name?: string; photo?: string; recruiterId?: string };
-    RecruiterProfile: { recruiterId: string; name: string };
-    CompanyProfile: { companyData: any };
-};
-
+// --- TIPAGENS ---
 export type ProfileStackParamList = {
     Profile: undefined;
     EditProfile: { profileData?: any };
@@ -59,14 +45,15 @@ export type ProfileStackParamList = {
     ChangePassword: undefined;
     LgpdRequest: undefined;
     TwoFactor: undefined;
+    Visibility: undefined;
+    TermsOfUse: undefined;
+    PrivacyPolicy: undefined;
 };
 
-export type AppTabParamList = {
-    HomeStack: undefined;
-    MatchesStack: undefined;
-    ChatStack: undefined;
-    ProfileStack: undefined;
-};
+export type HomeStackParamList = { Home: undefined; CompanyProfile: { companyData: any }; JobDetails: { jobData: any }; };
+export type MatchStackParamList = { MatchesList: undefined; MatchDetail: { matchData: any }; RecruiterProfile: { recruiterId: string; name: string }; CompanyProfile: { companyData: any }; };
+export type ChatStackParamList = { ChatList: undefined; ChatMessage: { matchId: string; name?: string; photo?: string; recruiterId?: string }; RecruiterProfile: { recruiterId: string; name: string }; CompanyProfile: { companyData: any }; };
+export type AppTabParamList = { HomeStack: undefined; MatchesStack: undefined; ChatStack: undefined; ProfileStack: undefined; };
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -79,6 +66,8 @@ const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const HomeNavigator = () => (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
         <HomeStack.Screen name="Home" component={HomeScreen} />
+        <HomeStack.Screen name="CompanyProfile" component={CompanyProfileScreen} />
+        <HomeStack.Screen name="JobDetails" component={JobDetailsScreen} />
     </HomeStack.Navigator>
 );
 
@@ -95,7 +84,6 @@ const ChatNavigator = () => (
     <ChatStack.Navigator screenOptions={{ headerShown: false }}>
         <ChatStack.Screen name="ChatList" component={ChatScreen} />
         <ChatStack.Screen name="ChatMessage" component={ChatMessageScreen} />
-        {/* Chat também precisa acessar perfis */}
         <ChatStack.Screen name="RecruiterProfile" component={RecruiterProfileScreen} />
         <ChatStack.Screen name="CompanyProfile" component={CompanyProfileScreen} />
     </ChatStack.Navigator>
@@ -103,24 +91,21 @@ const ChatNavigator = () => (
 
 const ProfileNavigator = () => (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-        {/* Tela Principal do Perfil */}
-        <ProfileStack.Screen name="Profile" component={ProfileScreen} />
-
-        {/* Configurações e Edição */}
+        <ProfileStack.Screen name="Profile" component={PersonalProfileScreen} />
         <ProfileStack.Screen name="ConfigApp" component={ConfigAppScreen} />
         <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
-
-        {/* Telas do Menu de Configuração */}
         <ProfileStack.Screen name="Notifications" component={NotificationScreen} />
         <ProfileStack.Screen name="PrivacySecurity" component={PrivacySecurityScreen} />
-        <ProfileStack.Screen name="DeleteProfile" component={DeleteProfileScreen} />
         <ProfileStack.Screen name="HelpSupport" component={HelpSupportScreen} />
         <ProfileStack.Screen name="AboutApp" component={AboutAppScreen} />
         <ProfileStack.Screen name="PersonalData" component={PersonalDataScreen} />
-
         <ProfileStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         <ProfileStack.Screen name="LgpdRequest" component={LgpdRequestScreen} />
         <ProfileStack.Screen name="TwoFactor" component={TwoFactorScreen} />
+        <ProfileStack.Screen name="DeleteProfile" component={DeleteProfileScreen} />
+        <ProfileStack.Screen name="Visibility" component={VisibilityScreen} />
+        <ProfileStack.Screen name="TermsOfUse" component={TermsOfUseScreen} />
+        <ProfileStack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
     </ProfileStack.Navigator>
 );
 
@@ -149,7 +134,8 @@ export default function AppTabNavigator() {
                     let iconName: keyof typeof Ionicons.glyphMap = 'home';
 
                     if (route.name === 'HomeStack') {
-                        iconName = focused ? 'home' : 'home-outline';
+                        // AQUI: Mudamos para o ícone PRISM (Logo da Empresa)
+                        iconName = focused ? 'prism' : 'prism-outline';
                     } else if (route.name === 'MatchesStack') {
                         iconName = focused ? 'heart' : 'heart-outline';
                     } else if (route.name === 'ChatStack') {
