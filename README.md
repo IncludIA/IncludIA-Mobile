@@ -12,7 +12,6 @@
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 
 </div>
----
 
 ## 📑 Índice
 
@@ -127,22 +126,13 @@ src/
     ```bash
     npm install
     ```
-
-2.  **Configure o IP da API:**
-    Abra o arquivo `src/services/api.ts` e altere o `baseURL` para o IP da sua máquina local (não use `localhost` se estiver no celular físico).
-
-    ```typescript
-    // Exemplo:
-    const baseURL = '[http://192.168.1.15:8080](http://192.168.1.15:8080)';
-    ```
-
-3.  **Execute o projeto:**
+2.  **Execute o projeto:**
 
     ```bash
     npx expo start
     ```
 
-4.  **Acesse:**
+3.  **Acesse:**
 
       * Pressione `a` para abrir no Android Emulator.
       * Pressione `i` para abrir no iOS Simulator.
