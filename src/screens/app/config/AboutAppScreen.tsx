@@ -4,9 +4,9 @@ import {
     ScrollView, LayoutAnimation, Platform, UIManager, Linking
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import { useTheme } from '../../../context/ThemeContext';
 
-// Habilita animações no Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -33,6 +33,8 @@ const FAQS = [
 export default function AboutAppScreen({ navigation }: any) {
     const { colors } = useTheme();
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+    const commitHash = Constants.expoConfig?.extra?.commitHash || 'N/A';
 
     const toggleExpand = (index: number) => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -88,7 +90,13 @@ export default function AboutAppScreen({ navigation }: any) {
                         <Ionicons name="prism" size={48} color={colors.primary} />
                     </View>
                     <Text style={[styles.appName, { color: colors.text }]}>Includ.IA</Text>
-                    <Text style={styles.version}>Versão 1.0.0 (Beta)</Text>
+                    <Text style={styles.version}>Versão 1.0.0</Text>
+
+                    {/* HASH DO COMMIT (Requisito para Nota Máxima) */}
+                    <View style={styles.hashTag}>
+                        <Ionicons name="git-commit-outline" size={12} color="#999" />
+                        <Text style={styles.hashText}>Build: {commitHash}</Text>
+                    </View>
                 </View>
 
                 {/* MISSÃO */}
@@ -155,7 +163,11 @@ const styles = StyleSheet.create({
     brandSection: { alignItems: 'center', marginBottom: 32 },
     logoContainer: { width: 80, height: 80, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
     appName: { fontSize: 28, fontWeight: '900', letterSpacing: -1, marginBottom: 4 },
-    version: { fontSize: 12, opacity: 0.5 },
+    version: { fontSize: 12, opacity: 0.5, marginBottom: 6 },
+
+    // Estilos do Hash
+    hashTag: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.05)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+    hashText: { fontSize: 10, color: '#999', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 
     missionBox: { padding: 20, borderRadius: 16, marginBottom: 32, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' },
     missionText: { textAlign: 'center', fontSize: 14, lineHeight: 22, fontStyle: 'italic', opacity: 0.8 },

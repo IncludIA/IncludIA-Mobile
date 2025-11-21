@@ -19,15 +19,11 @@ export default function DeleteProfileScreen({ navigation }: any) {
     const handleDelete = async () => {
         setLoading(true);
         try {
-            // endpoint hipotético para exclusão
             const endpoint = userRole === 'ROLE_RECRUITER'
-                ? '/recruiters/me'
-                : '/candidate/me';
+                ? '/recruiter-profile/me'
+                : '/profile/me';
 
-            // await api.delete(endpoint); // Descomente quando o backend tiver o delete
-
-            // Simulação
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await api.delete(endpoint);
 
             Alert.alert(
                 "Conta Excluída",
@@ -43,7 +39,8 @@ export default function DeleteProfileScreen({ navigation }: any) {
             );
 
         } catch (error) {
-            Alert.alert("Erro", "Não foi possível excluir sua conta no momento.");
+            console.error("Erro ao excluir:", error);
+            Alert.alert("Erro", "Não foi possível excluir sua conta no momento. Tente novamente.");
         } finally {
             setLoading(false);
         }
@@ -74,13 +71,13 @@ export default function DeleteProfileScreen({ navigation }: any) {
                     <View style={styles.pointRow}>
                         <Ionicons name="close-circle-outline" size={20} color="#FF3B30" />
                         <Text style={[styles.pointText, { color: colors.text }]}>
-                            Seu perfil ficará invisível para recrutadores.
+                            Seu perfil será desativado imediatamente.
                         </Text>
                     </View>
                     <View style={styles.pointRow}>
                         <Ionicons name="trash-outline" size={20} color="#FF3B30" />
                         <Text style={[styles.pointText, { color: colors.text }]}>
-                            Seus matches e histórico de conversas serão apagados.
+                            Seus dados não aparecerão mais nas buscas de recrutamento.
                         </Text>
                     </View>
                 </View>
