@@ -11,7 +11,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
     const [bio, setBio] = useState(profileData?.resumo || '');
 
     const handleSave = () => {
-        // Aqui chamaria api.put(...)
         Alert.alert("Sucesso", "Perfil atualizado!");
         navigation.goBack();
     };
