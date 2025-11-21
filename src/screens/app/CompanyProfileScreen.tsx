@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 
-// Interface baseada no JSON da API Java
 interface EmpresaProfile {
     id: string;
     nomeOficial: string;
@@ -15,7 +14,7 @@ interface EmpresaProfile {
     descricao: string;
     cultura: string;
     fotoCapaUrl?: string;
-    cnpj?: string; // Usamos para validar se é verificada
+    cnpj?: string;
 }
 
 const MOCK_JOBS = [
@@ -92,7 +91,6 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
 
                 <View style={styles.content}>
 
-                    {/* LOGO & Cabeçalho */}
                     <View style={styles.headerSection}>
                         <View style={[styles.logoContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
                             <Text style={[styles.logoText, { color: colors.primary }]}>
@@ -100,18 +98,15 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
                             </Text>
                         </View>
 
-                        {/* NOME DA EMPRESA + VERIFICADO */}
                         <View style={styles.nameRow}>
                             <Text style={[styles.companyName, { color: colors.text }]}>
                                 {company?.nomeFantasia}
                             </Text>
-                            {/* Selo de Verificado */}
                             <Ionicons name="checkmark-circle" size={22} color="#1DA1F2" />
                         </View>
 
                         <Text style={[styles.officialName, { color: colors.text }]}>{company?.nomeOficial}</Text>
 
-                        {/* Botão de Mapa */}
                         <TouchableOpacity onPress={handleOpenMaps} style={[styles.mapButton, { backgroundColor: 'rgba(0,122,255,0.1)' }]}>
                             <Ionicons name="location" size={16} color="#007AFF" />
                             <Text style={[styles.mapText, { color: "#007AFF" }]}>
@@ -123,7 +118,6 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
 
                     <View style={styles.divider} />
 
-                    {/* Descrição */}
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Sobre Nós</Text>
                         <Text style={[styles.description, { color: colors.text }]}>
@@ -131,7 +125,6 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
                         </Text>
                     </View>
 
-                    {/* Cultura (Destaque) */}
                     {company?.cultura && (
                         <View style={[styles.cultureBox, { backgroundColor: 'rgba(52, 199, 89, 0.1)' }]}>
                             <View style={styles.cultureHeader}>
@@ -144,7 +137,6 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
                         </View>
                     )}
 
-                    {/* Lista de Vagas */}
                     <View style={styles.jobsSection}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Vagas em Aberto</Text>
                         <FlatList

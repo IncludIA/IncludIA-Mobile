@@ -10,14 +10,13 @@ import api from '../../services/api';
 
 type UserType = 'candidate' | 'recruiter';
 
-// Função auxiliar para formatar CPF (XXX.XXX.XXX-XX)
 const formatCPF = (value: string) => {
     return value
-        .replace(/\D/g, '') // Remove tudo o que não é dígito
-        .replace(/(\d{3})(\d)/, '$1.$2') // Coloca o 1º ponto
-        .replace(/(\d{3})(\d)/, '$1.$2') // Coloca o 2º ponto
-        .replace(/(\d{3})(\d{1,2})/, '$1-$2') // Coloca o traço
-        .replace(/(-\d{2})\d+?$/, '$1'); // Limita o tamanho
+        .replace(/\D/g, '')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+        .replace(/(-\d{2})\d+?$/, '$1');
 };
 
 export default function RegisterScreen({ navigation }: any) {
@@ -27,7 +26,6 @@ export default function RegisterScreen({ navigation }: any) {
     const [userType, setUserType] = useState<UserType>('candidate');
     const [loading, setLoading] = useState(false);
 
-    // Estado para controlar quais campos estão com erro (vazios)
     const [errors, setErrors] = useState({
         nome: false,
         email: false,
@@ -45,11 +43,9 @@ export default function RegisterScreen({ navigation }: any) {
         empresaId: ''
     });
 
-    // Handler específico para CPF para aplicar a máscara
     const handleCpfChange = (text: string) => {
         const formatted = formatCPF(text);
         setFormData({ ...formData, cpf: formatted });
-        // Limpa o erro se o usuário começar a digitar
         if (errors.cpf) setErrors({ ...errors, cpf: false });
     };
 
@@ -58,7 +54,6 @@ export default function RegisterScreen({ navigation }: any) {
             nome: !formData.nome.trim(),
             email: !formData.email.trim(),
             senha: !formData.senha.trim(),
-            // CPF só é validado se for Candidato
             cpf: userType === 'candidate' && !formData.cpf.trim()
         };
 
@@ -73,7 +68,6 @@ export default function RegisterScreen({ navigation }: any) {
 
         setLoading(true);
 
-        // Remove pontuação do CPF para enviar limpo ao Backend (opcional, mas recomendado)
         const cpfLimpo = formData.cpf.replace(/\D/g, '');
 
         try {
@@ -84,7 +78,7 @@ export default function RegisterScreen({ navigation }: any) {
                     nome: formData.nome,
                     email: formData.email,
                     senha: formData.senha,
-                    cpf: cpfLimpo, // Envia apenas números
+                    cpf: cpfLimpo,
                     cidade: formData.cidade,
                     estado: formData.estado
                 });
@@ -117,7 +111,6 @@ export default function RegisterScreen({ navigation }: any) {
         } catch (error: any) {
             console.error(error);
 
-            // Lógica Inteligente: Detecta se o erro é de conflito (409 - Email/CPF já existe)
             if (error.response?.status === 409) {
                 Alert.alert(
                     'Conta Existente',
@@ -135,11 +128,10 @@ export default function RegisterScreen({ navigation }: any) {
         }
     };
 
-    // Função auxiliar para estilo de input com erro
     const getInputStyle = (hasError: boolean) => [
         styles.input,
         { backgroundColor: colors.card, color: colors.text, borderColor: hasError ? '#FF3B30' : colors.border },
-        hasError && { borderWidth: 1.5 } // Engrossa a borda se tiver erro
+        hasError && { borderWidth: 1.5 }
     ];
 
     return (
@@ -226,9 +218,9 @@ export default function RegisterScreen({ navigation }: any) {
                                 placeholder="CPF (000.000.000-00)"
                                 placeholderTextColor="#999"
                                 keyboardType="numeric"
-                                maxLength={14} // 11 números + 3 caracteres
+                                maxLength={14}
                                 value={formData.cpf}
-                                onChangeText={handleCpfChange} // Usa o formatador
+                                onChangeText={handleCpfChange}
                             />
                             <View style={styles.row}>
                                 <TextInput

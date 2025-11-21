@@ -99,8 +99,8 @@ export default function HomeScreen({ navigation }: any) {
 
     // Filtros aprimorados
     const [filters, setFilters] = useState({
-        modelo: 'TODOS', // TODOS, REMOTO, HIBRIDO, PRESENCIAL
-        tipoContrato: 'TODOS', // TODOS, TEMPO_INTEGRAL, CONTRATO, ESTAGIO
+        modelo: 'TODOS',
+        tipoContrato: 'TODOS',
         minSalario: 0,
         ordenarPor: 'RELEVANCIA',
         apenasMatch: false

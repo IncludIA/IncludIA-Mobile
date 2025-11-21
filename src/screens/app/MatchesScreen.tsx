@@ -9,7 +9,6 @@ import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 
 
-// --- INTERFACE (Baseada no Java) ---
 interface MatchItem {
     id: string;
     matchDate: string;
@@ -30,7 +29,6 @@ interface MatchItem {
     };
 }
 
-// --- DADOS MOCK (Fallback se a API falhar) ---
 const MOCK_MATCHES: MatchItem[] = [
     {
         id: 'mock-1',
@@ -70,7 +68,6 @@ export default function MatchesScreen({ navigation }: any) {
             if (data.length > 0) {
                 setMatches(data);
             } else {
-                // Se vier vazio, usa Mock para a apresentação não ficar feia
                 console.log("API retornou lista vazia. Usando Mocks.");
                 setMatches(MOCK_MATCHES);
             }
@@ -88,21 +85,18 @@ export default function MatchesScreen({ navigation }: any) {
         }, [])
     );
 
-    // --- NAVEGAÇÃO PARA O CHAT DIRETO ---
     const handleOpenChat = (item: MatchItem) => {
-        // Precisamos navegar para a ChatStack -> ChatMessage
         navigation.navigate('ChatStack', {
             screen: 'ChatMessage',
             params: {
                 matchId: item.id,
                 name: item.recruiter.nome || 'Recrutador',
                 photo: item.jobVaga.empresa.fotoCapaUrl,
-                recruiterId: item.recruiter.id // Importante para o perfil
+                recruiterId: item.recruiter.id
             }
         });
     };
 
-    // --- NAVEGAÇÃO PARA DETALHES DO MATCH ---
     const handleOpenDetails = (item: MatchItem) => {
         navigation.navigate('MatchDetail', { matchData: item });
     };
@@ -110,7 +104,6 @@ export default function MatchesScreen({ navigation }: any) {
     const renderItem = ({ item }: { item: MatchItem }) => (
         <View style={[styles.cardWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
 
-            {/* Área clicável principal: Vai para DETALHES */}
             <TouchableOpacity
                 style={styles.mainClickArea}
                 onPress={() => handleOpenDetails(item)}
@@ -133,7 +126,6 @@ export default function MatchesScreen({ navigation }: any) {
                 </View>
             </TouchableOpacity>
 
-            {/* Área do Ícone de Chat: Vai para CONVERSA */}
             <TouchableOpacity
                 style={[styles.chatIconBtn, { backgroundColor: 'rgba(0,122,255,0.1)' }]}
                 onPress={() => handleOpenChat(item)}

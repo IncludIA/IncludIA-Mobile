@@ -15,13 +15,11 @@ Notifications.setNotificationHandler({
 export async function registerForPushNotificationsAsync() {
     let token;
 
-    // 1. Verifica se é um dispositivo físico (Emuladores não recebem Push facilmente)
     if (!Device.isDevice) {
         console.log('Push Notifications não funcionam bem em emuladores. Use um celular físico.');
         return null;
     }
 
-    // 2. Verifica Permissões
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
@@ -35,7 +33,6 @@ export async function registerForPushNotificationsAsync() {
         return null;
     }
 
-    // 3. Obtém o Token do Expo (Este é o ID que o Java precisa!)
     try {
         const projectId = Constants?.expoConfig?.extra?.eas?.projectId || Constants?.easConfig?.projectId;
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;

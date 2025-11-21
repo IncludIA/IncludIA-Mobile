@@ -9,7 +9,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import api from '../../services/api';
 
-// --- GERADORES DE DOCUMENTOS VÁLIDOS PARA PASSAR NA VALIDAÇÃO DO JAVA ---
 const generateCPF = (): string => {
     const rnd = (n: number) => Math.round(Math.random() * n);
     const mod = (dividendo: number, divisor: number) => Math.round(dividendo - (Math.floor(dividendo / divisor) * divisor));
@@ -29,7 +28,7 @@ const generateCNPJ = (): string => {
     const rnd = (n: number) => Math.round(Math.random() * n);
     const mod = (dividendo: number, divisor: number) => Math.round(dividendo - (Math.floor(dividendo / divisor) * divisor));
     const n = Array(8).fill(0).map(() => rnd(9));
-    const n9 = 0; const n10 = 0; const n11 = 0; const n12 = 1; // Filial 0001
+    const n9 = 0; const n10 = 0; const n11 = 0; const n12 = 1;
     let d1 = n12 * 2 + n11 * 3 + n10 * 4 + n9 * 5 + n[7] * 6 + n[6] * 7 + n[5] * 8 + n[4] * 9 + n[3] * 2 + n[2] * 3 + n[1] * 4 + n[0] * 5;
     d1 = 11 - (mod(d1, 11));
     if (d1 >= 10) d1 = 0;
@@ -38,7 +37,6 @@ const generateCNPJ = (): string => {
     if (d2 >= 10) d2 = 0;
     return `${n.join('')}${n9}${n10}${n11}${n12}${d1}${d2}`;
 };
-// -----------------------------------------------------------------------
 
 export default function LoginScreen({ navigation }: any) {
     const [email, setEmail] = useState('');
@@ -64,7 +62,6 @@ export default function LoginScreen({ navigation }: any) {
         try {
             await signIn(email, password);
         } catch (error: any) {
-            // Loga o erro real do backend para você ver no terminal
             console.log("Erro Login:", error.response?.data || error.message);
             Alert.alert('Erro de Acesso', 'Email ou senha incorretos.');
         } finally {
@@ -82,13 +79,12 @@ export default function LoginScreen({ navigation }: any) {
         }
     ];
 
-    // --- DEMO CANDIDATO ---
     const handleDemoCandidate = async () => {
         setDemoLoading('candidate');
         const uniqueId = Date.now();
         const demoEmail = `candidato${uniqueId}@fiap.com`;
         const demoPass = "fiap123456";
-        const demoCpf = generateCPF(); // USA GERADOR VÁLIDO
+        const demoCpf = generateCPF();
 
         try {
             console.log(`Tentando criar candidato: ${demoEmail} CPF: ${demoCpf}`);
@@ -109,18 +105,16 @@ export default function LoginScreen({ navigation }: any) {
         }
     };
 
-    // --- DEMO RECRUTADOR ---
     const handleDemoRecruiter = async () => {
         setDemoLoading('recruiter');
         const uniqueId = Date.now();
         const demoEmail = `recrutador${uniqueId}@fiap.com`;
         const demoPass = "fiap123456";
-        const validCNPJ = generateCNPJ(); // USA GERADOR VÁLIDO
+        const validCNPJ = generateCNPJ();
 
         try {
             console.log(`Tentando criar empresa CNPJ: ${validCNPJ}`);
 
-            // 1. Cria empresa
             const novaEmpresa = await api.post('/empresas', {
                 nomeOficial: `Empresa Demo ${uniqueId}`,
                 nomeFantasia: `Startup FIAP`,
@@ -132,7 +126,6 @@ export default function LoginScreen({ navigation }: any) {
 
             const empresaId = novaEmpresa.data.id;
 
-            // 2. Cria recrutador
             await api.post('/auth/register-recruiter', {
                 nome: `Recrutador FIAP`,
                 email: demoEmail,
@@ -140,7 +133,6 @@ export default function LoginScreen({ navigation }: any) {
                 empresaId: empresaId
             });
 
-            // 3. Loga
             await signIn(demoEmail, demoPass);
 
         } catch (error: any) {
@@ -151,7 +143,7 @@ export default function LoginScreen({ navigation }: any) {
     };
 
     const handleDemoError = (error: any) => {
-        console.error("Erro Detalhado:", error.response?.data); // Isso vai mostrar no seu terminal o motivo do 400
+        console.error("Erro Detalhado:", error.response?.data);
 
         const msg = error.response?.data?.erro || error.message;
 
