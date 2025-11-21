@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     profileHeader: { alignItems: 'center', marginBottom: 30 },
     avatarContainer: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, justifyContent: 'center', alignItems: 'center', marginBottom: 12, overflow: 'hidden' },
     avatarImage: { width: '100%', height: '100%' },
-    avatarText: { fontSize: 32, fontWeight: 'bold', color: '#FFF' }, // Texto branco para contraste com fundo primary
+    avatarText: { fontSize: 32, fontWeight: 'bold', color: '#FFF' },
     name: { fontSize: 24, fontWeight: 'bold', marginBottom: 4, textAlign: 'center' },
     role: { fontSize: 16, opacity: 0.6, marginBottom: 12 },
 

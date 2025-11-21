@@ -25,7 +25,6 @@ interface Vaga {
     descricaoInclusiva: string;
     localizacao: string;
 
-    // Novos Campos do PUT
     tipoVaga: 'TEMPO_INTEGRAL' | 'MEIO_PERIODO' | 'CONTRATO' | 'FREELANCE' | 'ESTAGIO';
     modeloTrabalho: 'PRESENCIAL' | 'HIBRIDO' | 'REMOTO';
     salarioMin: number;
@@ -34,9 +33,8 @@ interface Vaga {
     experienciaRequerida: string;
     skillIds: string[];
 
-    // Dados auxiliares
     empresa: Empresa;
-    skills: string[]; // Nomes das skills para display
+    skills: string[];
     matchPercent?: number;
     distanciaKm?: number;
 }

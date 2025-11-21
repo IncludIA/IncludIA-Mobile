@@ -57,7 +57,6 @@ export default function MatchDetailScreen({ route, navigation }: any) {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-                {/* Hero Section */}
                 <View style={styles.hero}>
                     <View style={styles.matchIconContainer}>
                         <Ionicons name="heart" size={60} color="#FFF" />
@@ -72,7 +71,6 @@ export default function MatchDetailScreen({ route, navigation }: any) {
                     </Text>
                 </View>
 
-                {/* Card da Vaga */}
                 <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <View style={styles.cardHeader}>
                         <Image
@@ -115,7 +113,6 @@ export default function MatchDetailScreen({ route, navigation }: any) {
                     </TouchableOpacity>
                 </View>
 
-                {/* Link para Empresa */}
                 <TouchableOpacity
                     style={[styles.companyButton, { borderColor: colors.primary }]}
                     onPress={handleOpenCompany}

@@ -6,12 +6,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
+import api from '../../../services/api';
 
 const { width } = Dimensions.get('window');
 
-// --- INTERFACE BASEADA NO SEU JSON JAVA ---
+// --- TIPAGEM COMPLETA DO PERFIL ---
 interface CandidateProfile {
     id: string;
     nome: string;
@@ -21,9 +21,33 @@ interface CandidateProfile {
     cidade?: string;
     estado?: string;
     fotoPerfilUrl?: string;
-    skills?: { nome: string }[];
-    experiencias?: { tituloCargo: string; empresa: { nomeFantasia: string }; dataInicio: string; dataFim: string }[];
-    formacoes?: { nomeInstituicao: string; grau: string }[];
+    skills?: { id?: string; nome: string; tipoSkill?: string }[];
+    experiencias?: {
+        id?: string;
+        tituloCargo: string;
+        empresa: { nomeFantasia: string };
+        dataInicio: string;
+        dataFim?: string;
+        tipoEmprego?: string;
+    }[];
+    formacoes?: {
+        id?: string;
+        nomeInstituicao: string;
+        grau: string;
+        areaEstudo?: string;
+        dataInicio?: string;
+        dataFim?: string;
+    }[];
+    voluntariados?: {
+        id?: string;
+        organizacao: string;
+        funcao: string;
+    }[];
+    idiomas?: {
+        id?: string;
+        nomeIdioma: string;
+        nivelProficiencia: string;
+    }[];
 }
 
 export default function PersonalProfileScreen({ navigation }: any) {
@@ -32,52 +56,47 @@ export default function PersonalProfileScreen({ navigation }: any) {
     const [loading, setLoading] = useState(true);
     const [completeness, setCompleteness] = useState(0);
 
-    // Carrega os dados sempre que a tela ganha foco (ex: ao voltar da edição)
+    // Recarrega os dados sempre que a tela ganha foco (ex: ao voltar da edição)
     useFocusEffect(
         useCallback(() => {
             loadProfile();
         }, [])
     );
 
-    // --- LÓGICA DE CÁLCULO DE PORCENTAGEM (GAMIFICATION) ---
+    // --- CÁLCULO DE PROGRESSO (GAMIFICATION) ---
     const calculateProgress = (data: CandidateProfile) => {
+        if (!data) return;
+
         let score = 0;
-        const maxScore = 5; // Dividido em 5 categorias de 20% cada
+        const totalPoints = 7; // Total de seções avaliadas
 
-        // 1. Dados Básicos (Nome, Email, Local)
-        if (data.nome && data.email && data.cidade) score++;
-
-        // 2. Resumo Profissional
+        if (data.nome && data.email) score++;
+        if (data.cidade || data.estado) score++;
         if (data.resumoPerfil && data.resumoPerfil.length > 10) score++;
-
-        // 3. Skills (Pelo menos 1)
         if (data.skills && data.skills.length > 0) score++;
-
-        // 4. Experiência
         if (data.experiencias && data.experiencias.length > 0) score++;
-
-        // 5. Formação
         if (data.formacoes && data.formacoes.length > 0) score++;
+        if (data.idiomas && data.idiomas.length > 0) score++;
 
-        // Converte para porcentagem (0 a 100)
-        setCompleteness((score / maxScore) * 100);
+        setCompleteness(Math.round((score / totalPoints) * 100));
     };
 
     const loadProfile = async () => {
         setLoading(true);
         try {
-            // 1. Tenta pegar da API Real
+            // 1. Tenta buscar dados frescos da API
             const response = await api.get('/candidate/profile/me');
-            const data = response.data;
+            const apiData = response.data;
 
-            setProfile(data);
-            calculateProgress(data);
-
-            // Salva cache local para acesso offline rápido
-            await AsyncStorage.setItem('@includia_candidate_profile', JSON.stringify(data));
-
+            if (apiData) {
+                setProfile(apiData);
+                calculateProgress(apiData);
+                // Salva no cache para acesso offline
+                await AsyncStorage.setItem('@includia_candidate_profile', JSON.stringify(apiData));
+            }
         } catch (error) {
             console.log("Erro na API, tentando carregar do cache local...");
+            // 2. Se der erro, tenta carregar do cache
             const saved = await AsyncStorage.getItem('@includia_candidate_profile');
             if (saved) {
                 const data = JSON.parse(saved);
@@ -90,6 +109,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
     };
 
     const handleEdit = () => {
+        // Passa os dados atuais para a tela de edição para pré-preencher
         navigation.navigate('EditProfile', { profileData: profile });
     };
 
@@ -97,7 +117,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
         navigation.navigate('ConfigApp');
     };
 
-    // Helper para Iniciais (Ex: "Ana Silva" -> "AS")
+    // Gera iniciais para o avatar (Ex: "Ana Silva" -> "AS")
     const getInitials = (n: string) => {
         if (!n) return "EU";
         const parts = n.trim().split(' ');
@@ -105,14 +125,21 @@ export default function PersonalProfileScreen({ navigation }: any) {
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     };
 
-    // Helper para pegar o cargo atual (pega o primeiro da lista de experiência ou retorna padrão)
+    // Pega o cargo mais recente ou retorna padrão
     const getCurrentRole = () => {
         if (profile?.experiencias && profile.experiencias.length > 0) {
-            return profile.experiencias[0].tituloCargo; // Pega o cargo mais recente
+            return profile.experiencias[0].tituloCargo;
         }
-        return "Profissional em busca de oportunidades";
+        return "Disponível para oportunidades";
     };
 
+    const getLocation = () => {
+        if (profile?.cidade && profile?.estado) return `${profile.cidade}, ${profile.estado}`;
+        if (profile?.cidade) return profile.cidade;
+        return "Localização não informada";
+    };
+
+    // Loading inicial
     if (loading && !profile) {
         return (
             <View style={[styles.center, { backgroundColor: colors.background }]}>
@@ -138,7 +165,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={loadProfile} />}
                 showsVerticalScrollIndicator={false}
             >
-                {profile && (
+                {profile ? (
                     <>
                         {/* CARD DO PERFIL (AVATAR E NOME) */}
                         <View style={styles.profileHeader}>
@@ -150,6 +177,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                                         <Text style={styles.avatarText}>{getInitials(profile.nome)}</Text>
                                     </View>
                                 )}
+                                {/* Botão flutuante de edição no avatar */}
                                 <TouchableOpacity style={styles.editAvatarBtn} onPress={handleEdit}>
                                     <Ionicons name="pencil" size={14} color="#FFF" />
                                 </TouchableOpacity>
@@ -161,7 +189,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             <View style={styles.locationRow}>
                                 <Ionicons name="location-outline" size={14} color={colors.text} style={{ opacity: 0.6 }} />
                                 <Text style={[styles.location, { color: colors.text }]}>
-                                    {profile.cidade ? `${profile.cidade}, ${profile.estado}` : 'Localização não informada'}
+                                    {getLocation()}
                                 </Text>
                             </View>
 
@@ -170,7 +198,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             </TouchableOpacity>
                         </View>
 
-                        {/* BARRA DE PROGRESSO (DINÂMICA) */}
+                        {/* BARRA DE PROGRESSO (GAMIFICATION) */}
                         <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                             <View style={styles.progressHeader}>
                                 <Text style={[styles.progressTitle, { color: colors.text }]}>Força do Perfil</Text>
@@ -187,7 +215,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             <Text style={styles.progressHint}>
                                 {completeness === 100
                                     ? "🔥 Perfil Campeão! Você tem prioridade nos matches."
-                                    : "💡 Complete seu perfil (Experiência, Skills) para aparecer mais."}
+                                    : "💡 Complete seu perfil para aparecer em mais buscas."}
                             </Text>
                         </View>
 
@@ -197,7 +225,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Sobre</Text>
                             </View>
                             <Text style={[styles.bio, { color: colors.text }]}>
-                                {profile.resumoPerfil || "Adicione um resumo para a IA analisar seu perfil."}
+                                {profile.resumoPerfil || "Adicione um resumo para a IA analisar seu perfil e encontrar as melhores vagas."}
                             </Text>
                         </View>
 
@@ -214,7 +242,7 @@ export default function PersonalProfileScreen({ navigation }: any) {
                                         </View>
                                     ))
                                 ) : (
-                                    <Text style={{ opacity: 0.5, color: colors.text }}>Nenhuma skill adicionada.</Text>
+                                    <Text style={{ opacity: 0.5, color: colors.text }}>Nenhuma habilidade adicionada.</Text>
                                 )}
                             </View>
                         </View>
@@ -243,25 +271,57 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             )}
                         </View>
 
-                        {/* DADOS PESSOAIS */}
-                        <TouchableOpacity
-                            style={[styles.dataBtn, { backgroundColor: colors.card }]}
-                            onPress={() => navigation.navigate('PersonalData')}
-                        >
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                <View style={[styles.iconBox, { backgroundColor: 'rgba(0,0,0,0.05)' }]}>
-                                    <Ionicons name="shield-checkmark-outline" size={20} color={colors.text} />
-                                </View>
-                                <View>
-                                    <Text style={[styles.btnTitle, { color: colors.text }]}>Dados Pessoais e LGPD</Text>
-                                    <Text style={styles.btnSub}>CPF, E-mail e Privacidade</Text>
-                                </View>
+                        {/* FORMAÇÃO */}
+                        <View style={[styles.section, { backgroundColor: colors.card }]}>
+                            <View style={styles.sectionHeader}>
+                                <Text style={[styles.sectionTitle, { color: colors.text }]}>Educação</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={colors.border} />
-                        </TouchableOpacity>
+                            {profile.formacoes && profile.formacoes.length > 0 ? (
+                                profile.formacoes.map((edu, i) => (
+                                    <View key={i} style={styles.xpItem}>
+                                        <View style={[styles.xpIcon, { backgroundColor: 'rgba(0,0,0,0.05)' }]}>
+                                            <Ionicons name="school" size={18} color={colors.text} />
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={[styles.xpRole, { color: colors.text }]}>{edu.nomeInstituicao}</Text>
+                                            <Text style={styles.xpCompany}>{edu.grau} • {edu.areaEstudo}</Text>
+                                        </View>
+                                    </View>
+                                ))
+                            ) : (
+                                <Text style={{ opacity: 0.5, color: colors.text }}>Adicione sua formação acadêmica.</Text>
+                            )}
+                        </View>
+
+                        {/* IDIOMAS (Opcional) */}
+                        {profile.idiomas && profile.idiomas.length > 0 && (
+                            <View style={[styles.section, { backgroundColor: colors.card }]}>
+                                <View style={styles.sectionHeader}>
+                                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Idiomas</Text>
+                                </View>
+                                {profile.idiomas.map((idioma, i) => (
+                                    <View key={i} style={styles.xpItem}>
+                                        <View style={[styles.xpIcon, { backgroundColor: 'rgba(0,0,0,0.05)' }]}>
+                                            <Ionicons name="language" size={18} color={colors.text} />
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={[styles.xpRole, { color: colors.text }]}>{idioma.nomeIdioma}</Text>
+                                            <Text style={styles.xpCompany}>{idioma.nivelProficiencia}</Text>
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
 
                         <View style={{ height: 40 }} />
                     </>
+                ) : (
+                    <View style={[styles.center, { marginTop: 50 }]}>
+                        <Text style={{ color: colors.text, opacity: 0.6 }}>Perfil não encontrado ou erro de conexão.</Text>
+                        <TouchableOpacity onPress={loadProfile} style={{ marginTop: 20, padding: 10 }}>
+                            <Text style={{ color: colors.primary, fontWeight: 'bold' }}>Tentar Novamente</Text>
+                        </TouchableOpacity>
+                    </View>
                 )}
             </ScrollView>
         </SafeAreaView>
@@ -309,10 +369,5 @@ const styles = StyleSheet.create({
     xpItem: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12 },
     xpIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
     xpRole: { fontWeight: '600', fontSize: 15 },
-    xpCompany: { fontSize: 13, opacity: 0.6 },
-
-    dataBtn: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderRadius: 16, marginBottom: 20 },
-    iconBox: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-    btnTitle: { fontSize: 14, fontWeight: 'bold' },
-    btnSub: { fontSize: 12, opacity: 0.6 }
+    xpCompany: { fontSize: 13, opacity: 0.6 }
 });
