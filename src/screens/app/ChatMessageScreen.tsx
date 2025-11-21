@@ -107,13 +107,12 @@ export default function ChatMessageScreen({ route, navigation }: any) {
     };
 
     const handleGoToProfile = () => {
+        const targetId = recruiterId || 'mock-recruiter-id';
         navigation.navigate('RecruiterProfile', {
-            recruiterId: recruiterId || 'mock-id',
+            recruiterId: targetId,
             name: name
         });
     };
-
-    // --- RENDERIZADORES ---
 
     const renderMessageItem = ({ item, index }: { item: Message, index: number }) => {
         const isMe = item.senderId === 'me';
@@ -121,7 +120,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
 
         return (
             <View>
-                {/* Separador de Data */}
                 {showDate && (
                     <View style={styles.dateHeaderContainer}>
                         <View style={[styles.dateBadge, { backgroundColor: colors.card }]}>
@@ -130,7 +128,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                     </View>
                 )}
 
-                {/* Balão de Mensagem */}
                 <View style={[
                     styles.bubble,
                     isMe ? styles.bubbleMe : styles.bubbleThem,
@@ -159,8 +156,7 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
 
-                {/* Clicar no Avatar/Nome leva ao perfil */}
-                <TouchableOpacity style={styles.headerInfo} onPress={handleGoToProfile}>
+                <TouchableOpacity style={styles.headerInfo} onPress={handleGoToProfile} activeOpacity={0.7}>
                     {photo ? (
                         <Image source={{ uri: photo }} style={styles.headerAvatar} />
                     ) : (
@@ -170,17 +166,15 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                     )}
                     <View>
                         <Text style={[styles.headerName, { color: colors.text }]}>{name}</Text>
-                        {isMatchActive && <Text style={styles.headerStatus}>Online agora</Text>}
+                        {isMatchActive && <Text style={styles.headerStatus}>Toque para ver perfil</Text>}
                     </View>
                 </TouchableOpacity>
 
-                {/* Botão Menu 3 Pontos */}
                 <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.menuBtn}>
                     <Ionicons name="ellipsis-vertical" size={24} color={colors.text} />
                 </TouchableOpacity>
             </View>
 
-            {/* LISTA DE MENSAGENS */}
             <FlatList
                 ref={flatListRef}
                 data={messages}
@@ -189,7 +183,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                 contentContainerStyle={styles.listContent}
             />
 
-            {/* FOOTER (INPUT OU AVISO DE UNMATCH) */}
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}>
                 {isMatchActive ? (
                     <View style={[styles.inputContainer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
@@ -219,7 +212,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
                 )}
             </KeyboardAvoidingView>
 
-            {/* MODAL DO MENU (3 PONTINHOS) */}
             <Modal visible={menuVisible} transparent animationType="fade">
                 <TouchableWithoutFeedback onPress={() => setMenuVisible(false)}>
                     <View style={styles.modalOverlay}>

@@ -1,119 +1,95 @@
 import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Button,
-    SafeAreaView,
-    TouchableOpacity,
-    Switch,
-    Alert,
-} from 'react-native';
-import { useAuth } from '../../../context/AuthContext';
-import { useTheme } from '../../../context/ThemeContext';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ProfileStackParamList } from '../../../navigation/AppTabNavigator';
+import { useTheme } from '../../../context/ThemeContext';
+import { useAuth } from '../../../context/AuthContext';
 
-type Props = NativeStackScreenProps<ProfileStackParamList, 'ConfigApp'>;
-
-export default function ConfigAppScreen({ navigation }: Props) {
+export default function ConfigAppScreen({ navigation }: any) {
+    const { colors, isDark, toggleTheme } = useTheme();
     const { signOut } = useAuth();
-    const { isDark, toggleTheme, colors } = useTheme();
 
-    const handleDeleteAccount = () => {
+    const handleLogout = () => {
         Alert.alert(
-            'Deletar Conta',
-            'Você tem certeza? Esta ação é irreversível.',
+            "Sair",
+            "Tem certeza que deseja sair da sua conta?",
             [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                    text: 'Deletar',
-                    style: 'destructive',
-                    onPress: () => {
-                        console.log('Conta deletada (simulação)');
-                        signOut();
-                    },
-                },
+                { text: "Cancelar", style: "cancel" },
+                { text: "Sair", style: "destructive", onPress: signOut }
             ]
         );
     };
 
+    const OptionItem = ({ icon, label, onPress, value, isSwitch }: any) => (
+        <TouchableOpacity
+            style={[styles.item, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={isSwitch ? toggleTheme : onPress}
+            activeOpacity={isSwitch ? 1 : 0.7}
+        >
+            <View style={[styles.iconBox, { backgroundColor: isSwitch ? 'rgba(0,0,0,0.05)' : colors.background }]}>
+                <Ionicons name={icon} size={20} color={colors.text} />
+            </View>
+            <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+            {isSwitch ? (
+                <Switch
+                    value={value}
+                    onValueChange={toggleTheme}
+                    trackColor={{ false: "#767577", true: colors.primary }}
+                />
+            ) : (
+                <Ionicons name="chevron-forward" size={20} color={colors.border} />
+            )}
+        </TouchableOpacity>
+    );
+
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={28} color={colors.text} />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>Configurações</Text>
+                <View style={{ width: 24 }} />
             </View>
 
-            <View style={styles.content}>
-                <Text style={[styles.title, { color: colors.text }]}>Configurações</Text>
+            <ScrollView contentContainerStyle={styles.content}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Geral</Text>
 
-                <View style={[styles.optionRow, { backgroundColor: colors.card }]}>
-                    <Text style={[styles.optionText, { color: colors.text }]}>Tema Escuro</Text>
-                    <Switch
-                        trackColor={{ false: '#767577', true: colors.primary }}
-                        thumbColor={'#f4f3f4'}
-                        onValueChange={toggleTheme}
-                        value={isDark}
-                    />
-                </View>
+                <OptionItem icon="moon-outline" label="Modo Escuro" isSwitch value={isDark} />
+                <OptionItem icon="notifications-outline" label="Notificações" onPress={() => { }} />
+                <OptionItem icon="lock-closed-outline" label="Privacidade & Segurança" onPress={() => { }} />
 
-                <View style={styles.separator} />
+                <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}>Conta</Text>
 
-                <View style={styles.buttonContainer}>
-                    <Button title="Sair (Logout)" onPress={signOut} color={colors.primary} />
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title="Deletar Conta"
-                        onPress={handleDeleteAccount}
-                        color={colors.notification}
-                    />
-                </View>
-            </View>
+                <OptionItem icon="person-circle-outline" label="Dados Pessoais" onPress={() => navigation.navigate('EditProfile')} />
+                <OptionItem icon="help-circle-outline" label="Ajuda e Suporte" onPress={() => { }} />
+
+                <TouchableOpacity
+                    style={[styles.logoutBtn, { borderColor: '#FF3B30' }]}
+                    onPress={handleLogout}
+                >
+                    <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
+                    <Text style={styles.logoutText}>Sair da Conta</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.version}>Includ.IA v1.0.0 (Beta)</Text>
+            </ScrollView>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        paddingTop: 10,
-        paddingHorizontal: 20,
-    },
-    content: {
-        flex: 1,
-        alignItems: 'center',
-        paddingTop: 40,
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 40,
-    },
-    optionRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 20,
-    },
-    optionText: {
-        fontSize: 16,
-    },
-    separator: {
-        flex: 1,
-    },
-    buttonContainer: {
-        width: '100%',
-        marginTop: 15,
-        paddingBottom: 20,
-    },
+    container: { flex: 1 },
+    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 20, paddingBottom: 10 },
+    backBtn: { padding: 8 },
+    headerTitle: { fontSize: 18, fontWeight: 'bold' },
+    content: { padding: 24 },
+
+    sectionTitle: { fontSize: 14, fontWeight: '700', opacity: 0.5, textTransform: 'uppercase', marginBottom: 12, marginLeft: 4 },
+    item: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, marginBottom: 10, borderWidth: 1 },
+    iconBox: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+    label: { flex: 1, fontSize: 16, fontWeight: '500' },
+
+    logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, borderRadius: 16, borderWidth: 1, marginTop: 30, gap: 8 },
+    logoutText: { color: '#FF3B30', fontWeight: 'bold', fontSize: 16 },
+    version: { textAlign: 'center', marginTop: 20, opacity: 0.3, fontSize: 12 }
 });
