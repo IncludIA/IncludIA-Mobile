@@ -107,7 +107,7 @@ export default function TwoFactorScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingVertical: 35, alignItems: 'center' },
     title: { fontSize: 16, fontWeight: 'bold' },
     content: { padding: 24 },
 

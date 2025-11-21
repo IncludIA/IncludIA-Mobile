@@ -68,7 +68,7 @@ export default function NotificationScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' },
+    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingVertical: 30, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' },
     title: { fontSize: 18, fontWeight: 'bold' },
     content: { padding: 20 },
     sectionTitle: { fontSize: 14, fontWeight: '700', opacity: 0.6, marginBottom: 10, textTransform: 'uppercase' },

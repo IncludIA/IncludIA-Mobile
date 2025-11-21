@@ -10,8 +10,6 @@ export default function LgpdRequestScreen({ navigation }: any) {
     const [requested, setRequested] = useState(false);
 
     const handleRequestData = () => {
-        // Aqui chamaria api.post('/users/me/export-data')
-
         Alert.alert(
             "Solicitação Recebida",
             "Iniciamos o processamento do seu relatório de dados. Você receberá um arquivo ZIP no seu e-mail cadastrado em até 15 dias úteis, conforme a LGPD.",
@@ -86,7 +84,7 @@ export default function LgpdRequestScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingVertical: 25, alignItems: 'center' },
     backBtn: { padding: 4 },
     title: { fontSize: 16, fontWeight: '600' },
     content: { padding: 24 },

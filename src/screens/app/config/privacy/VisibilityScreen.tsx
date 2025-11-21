@@ -14,7 +14,6 @@ export default function VisibilityScreen({ navigation }: any) {
 
     const toggleSwitch = (key: keyof typeof settings) => {
         setSettings(prev => ({ ...prev, [key]: !prev[key] }));
-        // Aqui você chamaria api.put('/candidate/settings', { ... })
     };
 
     const SettingItem = ({ label, description, value, onToggle, icon }: any) => (
@@ -79,7 +78,7 @@ export default function VisibilityScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingVertical: 25, alignItems: 'center' },
     backBtn: { padding: 4 },
     title: { fontSize: 18, fontWeight: 'bold' },
     content: { padding: 20 },

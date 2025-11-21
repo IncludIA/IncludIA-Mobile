@@ -127,7 +127,7 @@ export default function ChangePasswordScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+    header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingVertical: 25, alignItems: 'center' },
     backBtn: { padding: 4 },
     title: { fontSize: 18, fontWeight: 'bold' },
     content: { padding: 24 },
