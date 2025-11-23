@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const api = axios.create({
-    baseURL: 'http://192.168.15.51:8080',
+    baseURL: 'http://app-includia-java-2771.azurewebsites.net/',
     timeout: 10000,
 });
 
