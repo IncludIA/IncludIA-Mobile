@@ -11,7 +11,6 @@ import api from '../../../services/api';
 
 const { width } = Dimensions.get('window');
 
-// --- TIPAGEM COMPLETA DO PERFIL ---
 interface CandidateProfile {
     id: string;
     nome: string;
@@ -56,19 +55,17 @@ export default function PersonalProfileScreen({ navigation }: any) {
     const [loading, setLoading] = useState(true);
     const [completeness, setCompleteness] = useState(0);
 
-    // Recarrega os dados sempre que a tela ganha foco (ex: ao voltar da edição)
     useFocusEffect(
         useCallback(() => {
             loadProfile();
         }, [])
     );
 
-    // --- CÁLCULO DE PROGRESSO (GAMIFICATION) ---
     const calculateProgress = (data: CandidateProfile) => {
         if (!data) return;
 
         let score = 0;
-        const totalPoints = 7; // Total de seções avaliadas
+        const totalPoints = 7;
 
         if (data.nome && data.email) score++;
         if (data.cidade || data.estado) score++;
@@ -84,19 +81,16 @@ export default function PersonalProfileScreen({ navigation }: any) {
     const loadProfile = async () => {
         setLoading(true);
         try {
-            // 1. Tenta buscar dados frescos da API
             const response = await api.get('/candidate/profile/me');
             const apiData = response.data;
 
             if (apiData) {
                 setProfile(apiData);
                 calculateProgress(apiData);
-                // Salva no cache para acesso offline
                 await AsyncStorage.setItem('@includia_candidate_profile', JSON.stringify(apiData));
             }
         } catch (error) {
             console.log("Erro na API, tentando carregar do cache local...");
-            // 2. Se der erro, tenta carregar do cache
             const saved = await AsyncStorage.getItem('@includia_candidate_profile');
             if (saved) {
                 const data = JSON.parse(saved);
@@ -109,7 +103,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
     };
 
     const handleEdit = () => {
-        // Passa os dados atuais para a tela de edição para pré-preencher
         navigation.navigate('EditProfile', { profileData: profile });
     };
 
@@ -117,7 +110,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
         navigation.navigate('ConfigApp');
     };
 
-    // Gera iniciais para o avatar (Ex: "Ana Silva" -> "AS")
     const getInitials = (n: string) => {
         if (!n) return "EU";
         const parts = n.trim().split(' ');
@@ -125,7 +117,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     };
 
-    // Pega o cargo mais recente ou retorna padrão
     const getCurrentRole = () => {
         if (profile?.experiencias && profile.experiencias.length > 0) {
             return profile.experiencias[0].tituloCargo;
@@ -139,7 +130,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
         return "Localização não informada";
     };
 
-    // Loading inicial
     if (loading && !profile) {
         return (
             <View style={[styles.center, { backgroundColor: colors.background }]}>
@@ -152,7 +142,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar barStyle={colors.background === '#000' ? 'light-content' : 'dark-content'} />
 
-            {/* Header */}
             <View style={styles.header}>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Meu Perfil</Text>
                 <TouchableOpacity onPress={handleSettings} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
@@ -167,7 +156,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
             >
                 {profile ? (
                     <>
-                        {/* CARD DO PERFIL (AVATAR E NOME) */}
                         <View style={styles.profileHeader}>
                             <View style={styles.avatarContainer}>
                                 {profile.fotoPerfilUrl ? (
@@ -177,7 +165,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                                         <Text style={styles.avatarText}>{getInitials(profile.nome)}</Text>
                                     </View>
                                 )}
-                                {/* Botão flutuante de edição no avatar */}
                                 <TouchableOpacity style={styles.editAvatarBtn} onPress={handleEdit}>
                                     <Ionicons name="pencil" size={14} color="#FFF" />
                                 </TouchableOpacity>
@@ -198,7 +185,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             </TouchableOpacity>
                         </View>
 
-                        {/* BARRA DE PROGRESSO (GAMIFICATION) */}
                         <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                             <View style={styles.progressHeader}>
                                 <Text style={[styles.progressTitle, { color: colors.text }]}>Força do Perfil</Text>
@@ -219,7 +205,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             </Text>
                         </View>
 
-                        {/* SOBRE */}
                         <View style={[styles.section, { backgroundColor: colors.card }]}>
                             <View style={styles.sectionHeader}>
                                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Sobre</Text>
@@ -229,7 +214,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             </Text>
                         </View>
 
-                        {/* SKILLS */}
                         <View style={[styles.section, { backgroundColor: colors.card }]}>
                             <View style={styles.sectionHeader}>
                                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Habilidades</Text>
@@ -247,7 +231,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             </View>
                         </View>
 
-                        {/* EXPERIÊNCIA */}
                         <View style={[styles.section, { backgroundColor: colors.card }]}>
                             <View style={styles.sectionHeader}>
                                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Experiência</Text>
@@ -271,7 +254,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             )}
                         </View>
 
-                        {/* FORMAÇÃO */}
                         <View style={[styles.section, { backgroundColor: colors.card }]}>
                             <View style={styles.sectionHeader}>
                                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Educação</Text>
@@ -293,7 +275,6 @@ export default function PersonalProfileScreen({ navigation }: any) {
                             )}
                         </View>
 
-                        {/* IDIOMAS (Opcional) */}
                         {profile.idiomas && profile.idiomas.length > 0 && (
                             <View style={[styles.section, { backgroundColor: colors.card }]}>
                                 <View style={styles.sectionHeader}>

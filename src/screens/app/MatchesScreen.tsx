@@ -183,7 +183,6 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         borderRadius: 16,
         borderWidth: 1,
-        // Sombra leve
         shadowColor: '#000',
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -200,7 +199,6 @@ const styles = StyleSheet.create({
     companyName: { fontSize: 14, fontWeight: '600', opacity: 0.9 },
     dateText: { fontSize: 12, opacity: 0.5, marginTop: 4 },
 
-    // Botão de Chat
     chatIconBtn: {
         padding: 12,
         borderRadius: 12,

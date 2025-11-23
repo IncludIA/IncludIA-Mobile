@@ -5,20 +5,16 @@ import {
     Alert, Image, ActivityIndicator, Keyboard
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-// --- CORREÇÃO DOS IMPORTES (Subindo 3 níveis) ---
 import { useTheme } from '../../../context/ThemeContext';
 import api from '../../../services/api';
 
-// --- INTERFACES ---
 interface Message {
     id: string;
     text: string;
-    senderId: string; // 'me' ou ID do recrutador
-    timestamp: string; // ISO String
+    senderId: string;
+    timestamp: string;
 }
 
-// --- MOCKS (Para não travar a demo) ---
 const MOCK_MESSAGES: Message[] = [
     { id: '1', text: 'Olá! Vi seu perfil e achei muito interessante.', senderId: 'other', timestamp: new Date(Date.now() - 172800000).toISOString() },
     { id: '2', text: 'Oi! Muito obrigado.\nFiquei interessado na vaga.', senderId: 'me', timestamp: new Date(Date.now() - 86400000).toISOString() },
@@ -42,7 +38,6 @@ export default function ChatMessageScreen({ route, navigation }: any) {
         loadMessages();
     }, []);
 
-    // Rola para o final quando o teclado abre
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
             flatListRef.current?.scrollToEnd({ animated: true });

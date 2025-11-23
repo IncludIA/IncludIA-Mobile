@@ -6,7 +6,6 @@ import { useTheme } from '../../../context/ThemeContext';
 export default function PersonalDataScreen({ navigation }: any) {
     const { colors } = useTheme();
 
-    // Mock de dados (em produção viria do Contexto ou API)
     const userData = {
         nome: "Alex Pereira",
         cpf: "123.***.***-99",

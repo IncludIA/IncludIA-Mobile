@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../context/ThemeContext';
 import api from '../../../services/api';
 
-// --- INTERFACES ---
 interface ChatPreview {
     id: string;
     recipientId: string;
@@ -18,7 +17,6 @@ interface ChatPreview {
     unreadCount: number;
 }
 
-// --- MOCKS ---
 const MOCK_CHATS: ChatPreview[] = [
     {
         id: 'c1',
@@ -27,7 +25,7 @@ const MOCK_CHATS: ChatPreview[] = [
         isOnline: true,
         lastMessage: 'Adoramos seu perfil! Podemos agendar uma entrevista?',
         lastMessageTime: new Date().toISOString(),
-        unreadCount: 2 // Não lido
+        unreadCount: 2
     },
     {
         id: 'c4',
@@ -36,7 +34,7 @@ const MOCK_CHATS: ChatPreview[] = [
         isOnline: false,
         lastMessage: 'Seu teste técnico foi excelente! Parabéns.',
         lastMessageTime: new Date(Date.now() - 172800000).toISOString(),
-        unreadCount: 5 // Não lido
+        unreadCount: 5
     },
     {
         id: 'c2',
@@ -45,7 +43,7 @@ const MOCK_CHATS: ChatPreview[] = [
         isOnline: true,
         lastMessage: 'Obrigado pelo interesse na vaga de Java.',
         lastMessageTime: new Date(Date.now() - 3600000).toISOString(),
-        unreadCount: 0 // Lido
+        unreadCount: 0
     },
     {
         id: 'c3',
@@ -85,14 +83,12 @@ export default function ChatScreen({ navigation }: any) {
             const response = await api.get('/chats');
             let data = response.data && response.data.length > 0 ? response.data : MOCK_CHATS;
 
-            // Ordena: Mais recentes primeiro
             data.sort((a: ChatPreview, b: ChatPreview) =>
                 new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime()
             );
 
             setChats(data);
         } catch (error) {
-            // Fallback ordenado
             const sortedMock = [...MOCK_CHATS].sort((a, b) =>
                 new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime()
             );
@@ -147,7 +143,6 @@ export default function ChatScreen({ navigation }: any) {
                 style={[styles.chatItem, { backgroundColor: colors.card, borderColor: colors.border }]}
                 onPress={() => handleOpenChat(item)}
             >
-                {/* Avatar de Letra */}
                 <View style={styles.avatarContainer}>
                     <View style={[styles.avatarCircle, { backgroundColor: isUnread ? colors.primary : '#CCC' }]}>
                         <Text style={styles.avatarText}>{getInitials(item.recipientName)}</Text>
@@ -257,7 +252,6 @@ const styles = StyleSheet.create({
     onlineSection: { marginBottom: 10 },
     sectionTitle: { fontSize: 14, fontWeight: '700', opacity: 0.6, textTransform: 'uppercase', marginBottom: 10, },
 
-    // Estilos Online (Topo)
     onlineItem: { alignItems: 'center', marginRight: 20 },
     avatarCircleBig: { width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', marginBottom: 6, position: 'relative' },
     avatarTextBig: { color: '#FFF', fontSize: 24, fontWeight: 'bold' },
@@ -266,7 +260,6 @@ const styles = StyleSheet.create({
 
     listContent: { paddingBottom: 20 },
 
-    // Estilos Chat Item
     chatItem: { flexDirection: 'row', alignItems: 'center', padding: 16, marginHorizontal: 24, marginBottom: 12, borderRadius: 20, borderWidth: 1 },
     avatarContainer: { position: 'relative', marginRight: 16 },
     avatarCircle: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center' },

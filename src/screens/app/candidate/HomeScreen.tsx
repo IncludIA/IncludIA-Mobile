@@ -39,7 +39,6 @@ interface Vaga {
     distanciaKm?: number;
 }
 
-// --- MOCK ROBUSTO ---
 const MOCK_VAGAS: Vaga[] = [
     {
         id: 'mock-1',
@@ -97,7 +96,6 @@ export default function HomeScreen({ navigation }: any) {
     const [loading, setLoading] = useState(true);
     const [filterVisible, setFilterVisible] = useState(false);
 
-    // Filtros aprimorados
     const [filters, setFilters] = useState({
         modelo: 'TODOS',
         tipoContrato: 'TODOS',
@@ -247,7 +245,6 @@ export default function HomeScreen({ navigation }: any) {
                     <View>
                         <Text style={[styles.jobTitle, { color: colors.text }]} numberOfLines={2}>{item.titulo}</Text>
 
-                        {/* LINK PARA EMPRESA */}
                         <TouchableOpacity onPress={() => handleCompanyPress(item.empresa)} style={styles.companyBtn}>
                             <Ionicons name="business" size={16} color={colors.primary} />
                             <Text style={[styles.companyName, { color: colors.primary }]}>
@@ -274,7 +271,6 @@ export default function HomeScreen({ navigation }: any) {
         );
     };
 
-    // --- MODAL DE FILTROS APRIMORADO ---
     const renderFilterModal = () => (
         <Modal animationType="fade" transparent={true} visible={filterVisible} onRequestClose={() => setFilterVisible(false)}>
             <View style={styles.modalContainer}>

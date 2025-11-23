@@ -46,7 +46,6 @@ export default function TwoFactorScreen({ navigation }: any) {
             </View>
 
             <View style={styles.content}>
-                {/* Header Switch */}
                 <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.label, { color: colors.text }]}>Ativar 2FA</Text>
@@ -60,7 +59,6 @@ export default function TwoFactorScreen({ navigation }: any) {
                     />
                 </View>
 
-                {/* PASSO 1: SETUP (Mostra Chave) */}
                 {step === 1 && (
                     <View style={styles.setupContainer}>
                         <Text style={[styles.stepTitle, { color: colors.text }]}>Configuração</Text>
@@ -90,7 +88,6 @@ export default function TwoFactorScreen({ navigation }: any) {
                     </View>
                 )}
 
-                {/* PASSO 2: ATIVADO */}
                 {step === 2 && (
                     <View style={styles.activeContainer}>
                         <Ionicons name="shield-checkmark" size={80} color="#34C759" />

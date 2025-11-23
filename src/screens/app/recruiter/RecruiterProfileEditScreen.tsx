@@ -15,11 +15,9 @@ export default function RecruiterProfileEditScreen({ navigation }: any) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    // Dados do Recrutador
     const [recruiterName, setRecruiterName] = useState('');
     const [recruiterEmail, setRecruiterEmail] = useState('');
 
-    // Dados da Empresa
     const [companyName, setCompanyName] = useState('');
     const [companyDesc, setCompanyDesc] = useState('');
     const [companyCulture, setCompanyCulture] = useState('');
@@ -83,7 +81,6 @@ export default function RecruiterProfileEditScreen({ navigation }: any) {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
-            {/* Header com Configuração */}
             <View style={styles.header}>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Meu Perfil</Text>
                 <TouchableOpacity onPress={() => navigation.navigate('ConfigApp')} style={[styles.iconBtn, { backgroundColor: colors.card }]}>
@@ -94,7 +91,6 @@ export default function RecruiterProfileEditScreen({ navigation }: any) {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                    {/* Avatar do Recrutador */}
                     <View style={styles.profileHeader}>
                         <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
                             <Text style={styles.avatarText}>{getInitials(recruiterName)}</Text>
@@ -103,7 +99,6 @@ export default function RecruiterProfileEditScreen({ navigation }: any) {
                         <Text style={[styles.role, { color: colors.text }]}>Tech Recruiter em {companyName}</Text>
                     </View>
 
-                    {/* EDIÇÃO: DADOS PESSOAIS */}
                     <Text style={[styles.sectionLabel, { color: colors.text }]}>Meus Dados</Text>
                     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                         <View style={styles.inputGroup}>

@@ -77,7 +77,6 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
             <ScrollView showsVerticalScrollIndicator={false}>
 
-                {/* Capa */}
                 <View style={styles.coverContainer}>
                     <Image
                         source={{ uri: company?.fotoCapaUrl || 'https://source.unsplash.com/random/800x600/?office,building' }}
@@ -158,16 +157,13 @@ export default function CompanyProfileScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
     container: { flex: 1 },
 
-    // Capa
     coverContainer: { height: 200, width: '100%' },
     coverImage: { width: '100%', height: '100%', resizeMode: 'cover' },
     overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.2)' },
     backBtnFloat: { position: 'absolute', top: 50, left: 24, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
 
-    // Conteúdo Principal
     content: { paddingHorizontal: 24 },
 
-    // Header com Logo
     headerSection: { alignItems: 'center', marginTop: -50, marginBottom: 20 },
     logoContainer: {
         width: 100, height: 100, borderRadius: 24, borderWidth: 4,
@@ -176,30 +172,25 @@ const styles = StyleSheet.create({
     },
     logoText: { fontSize: 48, fontWeight: 'bold' },
 
-    // Linha do Nome + Verificado
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
     companyName: { fontSize: 28, fontWeight: 'bold', textAlign: 'center' },
 
     officialName: { fontSize: 14, opacity: 0.5, textAlign: 'center', marginBottom: 12 },
 
-    // Botão Mapa
     mapButton: { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, alignItems: 'center', gap: 6 },
     mapText: { fontWeight: '600', fontSize: 14 },
 
     divider: { height: 1, backgroundColor: '#DDD', width: '100%', marginVertical: 20, opacity: 0.5 },
 
-    // Seções
     section: { marginBottom: 24 },
     sectionTitle: { fontSize: 18, fontWeight: '800', marginBottom: 12 },
     description: { fontSize: 15, lineHeight: 24, opacity: 0.8 },
 
-    // Cultura
     cultureBox: { padding: 20, borderRadius: 20, marginBottom: 24 },
     cultureHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
     cultureTitle: { fontSize: 16, fontWeight: 'bold' },
     cultureText: { fontSize: 15, lineHeight: 22, fontWeight: '500' },
 
-    // Vagas
     jobsSection: { marginBottom: 40 },
     jobCard: { width: 160, padding: 16, borderRadius: 20, borderWidth: 1, marginRight: 0 },
     jobIconBg: { width: 36, height: 36, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.05)', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },

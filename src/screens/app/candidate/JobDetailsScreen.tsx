@@ -100,10 +100,8 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                     </View>
                 </View>
 
-                {/* CONTEÚDO PRINCIPAL */}
                 <View style={[styles.content, { backgroundColor: colors.background }]}>
 
-                    {/* Grid de Informações Rápidas */}
                     <View style={styles.gridContainer}>
                         <InfoCard
                             icon="cash-outline"
@@ -131,7 +129,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                         />
                     </View>
 
-                    {/* IA Summary */}
                     <View style={[styles.aiBox, { backgroundColor: 'rgba(138, 43, 226, 0.08)', borderColor: 'rgba(138, 43, 226, 0.2)' }]}>
                         <View style={styles.aiHeader}>
                             <Ionicons name="sparkles" size={18} color="#8A2BE2" />
@@ -142,7 +139,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                         </Text>
                     </View>
 
-                    {/* Descrição Original */}
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Descrição da Vaga</Text>
                         <Text style={[styles.bodyText, { color: colors.text }]}>
@@ -150,7 +146,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                         </Text>
                     </View>
 
-                    {/* Benefícios */}
                     {jobData.beneficios && (
                         <View style={styles.section}>
                             <Text style={[styles.sectionTitle, { color: colors.text }]}>Benefícios</Text>
@@ -165,7 +160,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                         </View>
                     )}
 
-                    {/* Skills */}
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Habilidades Necessárias</Text>
                         <View style={styles.skillsContainer}>
@@ -177,7 +171,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                         </View>
                     </View>
 
-                    {/* Sobre a Empresa (Link) */}
                     <TouchableOpacity
                         style={[styles.companyLink, { backgroundColor: colors.card, borderColor: colors.border }]}
                         onPress={() => navigation.navigate('CompanyProfile', { companyData: jobData.empresa })}
@@ -195,7 +188,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
                 </View>
             </ScrollView>
 
-            {/* FOOTER FIXO */}
             <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
                 <TouchableOpacity
                     style={[styles.applyButton, { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 }]}
@@ -215,7 +207,6 @@ export default function JobDetailsScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
     container: { flex: 1 },
 
-    // Header Imersivo
     imageContainer: { height: 300, width: '100%', position: 'relative' },
     coverImage: { width: '100%', height: '100%', resizeMode: 'cover' },
     overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)' },
@@ -231,44 +222,36 @@ const styles = StyleSheet.create({
     locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
     locationText: { color: '#FFF', fontSize: 14, fontWeight: '500' },
 
-    // Corpo arredondado
     content: { marginTop: -24, borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 24, paddingTop: 30 },
 
-    // Grid Info
     gridContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginBottom: 24 },
     infoCard: { width: '48%', flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 16, borderWidth: 1, gap: 10 },
     iconCircle: { width: 36, height: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
     infoLabel: { fontSize: 11, opacity: 0.6, marginBottom: 2 },
     infoValue: { fontSize: 13, fontWeight: '700' },
 
-    // AI Box
     aiBox: { padding: 20, borderRadius: 20, borderWidth: 1, marginBottom: 24 },
     aiHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
     aiTitle: { color: '#8A2BE2', fontWeight: 'bold', fontSize: 14 },
     aiText: { fontSize: 14, lineHeight: 22, opacity: 0.9 },
 
-    // Seções Genéricas
     section: { marginBottom: 24 },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
     bodyText: { fontSize: 15, lineHeight: 24, opacity: 0.7 },
 
-    // Benefícios
     benefitsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
     benefitItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, borderWidth: 1, gap: 6 },
     benefitText: { fontSize: 13, fontWeight: '500' },
 
-    // Skills
     skillsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     skillChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
     skillText: { fontSize: 13, fontWeight: '600' },
 
-    // Company Link
     companyLink: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderRadius: 16, borderWidth: 1, marginTop: 10 },
     companyLinkLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     miniLogoRound: { width: 40, height: 40, borderRadius: 20 },
     companyLinkName: { fontWeight: 'bold', fontSize: 16 },
 
-    // Footer
     footer: { position: 'absolute', bottom: 0, width: '100%', padding: 20, paddingBottom: Platform.OS === 'ios' ? 30 : 20, borderTopWidth: 1, shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.05, elevation: 10 },
     applyButton: { flexDirection: 'row', height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', gap: 10, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 5, elevation: 5 },
     applyButtonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' }

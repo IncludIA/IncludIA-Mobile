@@ -3,14 +3,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
-
-// Telas do Recrutador
 import RecruiterDashboardScreen from '../screens/app/recruiter/RecruiterDashboardScreen';
 import PostJobScreen from '../screens/app/recruiter/PostJobScreen';
 import CandidateFeedScreen from '../screens/app/recruiter/CandidateFeedScreen';
 import RecruiterProfileEditScreen from '../screens/app/recruiter/RecruiterProfileEditScreen';
-
-// Telas Comuns
 import NotificationScreen from '../screens/app/config/NotificationScreen';
 import PrivacySecurityScreen from '../screens/app/config/PrivacySecurityScreen';
 import HelpSupportScreen from '../screens/app/config/HelpSupportScreen';
@@ -35,7 +31,6 @@ import VisibilityScreen from '../screens/app/config/privacy/VisibilityScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// --- STACKS ESPECÍFICAS DO RECRUTADOR ---
 
 const DashboardStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

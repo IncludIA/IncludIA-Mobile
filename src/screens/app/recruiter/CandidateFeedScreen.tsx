@@ -36,12 +36,10 @@ export default function CandidateFeedScreen({ route, navigation }: any) {
         }
     };
 
-    // --- Lógica de Swipe Simplificada para Recrutador (Botões) ---
     const handleSwipe = async (liked: boolean) => {
         if (candidates.length === 0) return;
         const current = candidates[0];
 
-        // Animação rápida de saída
         Animated.timing(position, {
             toValue: { x: liked ? 500 : -500, y: 0 },
             duration: 250,

@@ -14,7 +14,7 @@ const commitHash = getGitCommitHash();
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Includ.IA",
-  slug: "Includ.IA",
+  slug: "includia-mobile",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icone.png",
@@ -29,6 +29,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true
   },
   android: {
+    package: "com.includia.mobile",
     adaptiveIcon: {
       foregroundImage: "./assets/icone.png",
       backgroundColor: "#ffffff"
@@ -45,7 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     commitHash: commitHash,
     eas: {
-      projectId: "seu-project-id-se-tiver"
+      projectId: "c2217bb6-17a9-415e-83df-5eb0ac743226"
     }
   }
 });

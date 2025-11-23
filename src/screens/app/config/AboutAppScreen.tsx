@@ -84,7 +84,6 @@ export default function AboutAppScreen({ navigation }: any) {
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                {/* BRANDING */}
                 <View style={styles.brandSection}>
                     <View style={[styles.logoContainer, { backgroundColor: 'rgba(0,122,255,0.1)' }]}>
                         <Ionicons name="prism" size={48} color={colors.primary} />
@@ -92,14 +91,12 @@ export default function AboutAppScreen({ navigation }: any) {
                     <Text style={[styles.appName, { color: colors.text }]}>Includ.IA</Text>
                     <Text style={styles.version}>Versão 1.0.0</Text>
 
-                    {/* HASH DO COMMIT (Requisito para Nota Máxima) */}
                     <View style={styles.hashTag}>
                         <Ionicons name="git-commit-outline" size={12} color="#999" />
                         <Text style={styles.hashText}>Build: {commitHash}</Text>
                     </View>
                 </View>
 
-                {/* MISSÃO */}
                 <View style={[styles.missionBox, { backgroundColor: colors.card }]}>
                     <Ionicons name="rocket-outline" size={24} color={colors.primary} style={{ marginBottom: 8 }} />
                     <Text style={[styles.missionText, { color: colors.text }]}>
@@ -107,7 +104,6 @@ export default function AboutAppScreen({ navigation }: any) {
                     </Text>
                 </View>
 
-                {/* FAQ */}
                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Perguntas Frequentes</Text>
                 <View style={styles.faqList}>
                     {FAQS.map((item, index) => (
@@ -115,7 +111,6 @@ export default function AboutAppScreen({ navigation }: any) {
                     ))}
                 </View>
 
-                {/* LINKS JURÍDICOS */}
                 <View style={styles.linksContainer}>
                     <TouchableOpacity style={styles.linkItem} onPress={() => navigation.navigate('TermsOfUse')}>
                         <Text style={[styles.linkText, { color: colors.primary }]}>Termos de Uso</Text>
@@ -130,7 +125,6 @@ export default function AboutAppScreen({ navigation }: any) {
                     </TouchableOpacity>
                 </View>
 
-                {/* SOCIAL & COPYRIGHT */}
                 <View style={styles.footer}>
                     <View style={styles.socialRow}>
                         <TouchableOpacity onPress={() => Linking.openURL('https://instagram.com')}>
@@ -165,7 +159,6 @@ const styles = StyleSheet.create({
     appName: { fontSize: 28, fontWeight: '900', letterSpacing: -1, marginBottom: 4 },
     version: { fontSize: 12, opacity: 0.5, marginBottom: 6 },
 
-    // Estilos do Hash
     hashTag: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.05)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
     hashText: { fontSize: 10, color: '#999', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 

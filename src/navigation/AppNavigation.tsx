@@ -1,16 +1,14 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native'; // <--- O ÚNICO CONTAINER DEVE ESTAR AQUI
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
-// Telas de Autenticação
 import WelcomeScreen from '../screens/auth/WelcomeScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 
-// Navegadores Principais Separados
 import CandidateTabNavigator from './CandidateTabNavigator';
 import RecruiterTabNavigator from './RecruiterTabNavigator';
 

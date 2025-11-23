@@ -9,7 +9,6 @@ import { useTheme } from '../../../context/ThemeContext';
 
 
 
-// --- INTERFACES ---
 interface Skill { id?: string; nome: string; tipoSkill: string; }
 interface Experiencia {
     id?: string;
@@ -38,19 +37,16 @@ export default function EditProfileScreen({ navigation, route }: any) {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // Modais de Adição
     const [modalVisible, setModalVisible] = useState(false);
     const [modalType, setModalType] = useState('');
     const [tempItem, setTempItem] = useState<any>({});
 
-    // --- ESTADOS DO PERFIL ---
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [resumo, setResumo] = useState('');
     const [cidade, setCidade] = useState('');
     const [estado, setEstado] = useState('');
 
-    // Listas
     const [skills, setSkills] = useState<Skill[]>([]);
     const [experiencias, setExperiencias] = useState<Experiencia[]>([]);
     const [formacoes, setFormacoes] = useState<Formacao[]>([]);
@@ -97,7 +93,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
         return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
     };
 
-    // --- GERENCIAMENTO DE ITENS ---
     const handleAddSkill = () => {
         const text = newSkillText.trim();
         if (text.length > 0 && !skills.some(s => s.nome.toLowerCase() === text.toLowerCase())) {
@@ -117,8 +112,8 @@ export default function EditProfileScreen({ navigation, route }: any) {
         if (modalType === 'EXPERIENCIA') {
             setExperiencias([...experiencias, {
                 ...tempItem,
-                empresa: { nomeFantasia: tempItem.empresaName }, // Ajuste para estrutura da API
-                tipoEmprego: 'TEMPO_INTEGRAL' // Default
+                empresa: { nomeFantasia: tempItem.empresaName },
+                tipoEmprego: 'TEMPO_INTEGRAL'
             }]);
         } else if (modalType === 'EDUCACAO') {
             setFormacoes([...formacoes, tempItem]);
@@ -161,7 +156,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
         }
     };
 
-    // --- RENDERIZADORES ---
     const renderListItem = (title: string, subtitle: string, onDelete: () => void, icon: any) => (
         <View style={[styles.listItem, { backgroundColor: colors.background, borderColor: colors.border }]}>
             <View style={[styles.listIconBox, { backgroundColor: colors.card }]}>
@@ -179,7 +173,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-            {/* Header */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()} disabled={saving}>
                     <Text style={{ color: colors.text, fontSize: 16 }}>Cancelar</Text>
@@ -194,7 +187,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-                    {/* Avatar Fixo */}
                     <View style={styles.avatarSection}>
                         <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
                             <Text style={styles.avatarText}>{getInitials(nome)}</Text>
@@ -202,7 +194,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
                         <Text style={{ color: colors.text, opacity: 0.5, fontSize: 12 }}>Nome e E-mail são gerenciados pelo sistema</Text>
                     </View>
 
-                    {/* Dados Básicos (Read Only e Editáveis) */}
                     <Text style={[styles.sectionLabel, { color: colors.text }]}>Informações Básicas</Text>
                     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                         <View style={[styles.readOnlyRow, { borderBottomColor: colors.border }]}>
@@ -227,7 +218,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
                         </View>
                     </View>
 
-                    {/* Resumo */}
                     <Text style={[styles.sectionLabel, { color: colors.text }]}>Resumo Profissional</Text>
                     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, padding: 0 }]}>
                         <TextInput
@@ -241,7 +231,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
                         />
                     </View>
 
-                    {/* Skills */}
                     <Text style={[styles.sectionLabel, { color: colors.text }]}>Habilidades & Competências</Text>
                     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                         <View style={styles.addSkillRow}>
@@ -268,7 +257,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
                         </View>
                     </View>
 
-                    {/* Seções Dinâmicas */}
                     <View style={styles.dynamicSection}>
                         <View style={styles.listSectionHeader}>
                             <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 0 }]}>Experiência</Text>
@@ -317,7 +305,6 @@ export default function EditProfileScreen({ navigation, route }: any) {
                 </ScrollView>
             </KeyboardAvoidingView>
 
-            {/* MODAL DE ADIÇÃO */}
             <Modal visible={modalVisible} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
@@ -413,7 +400,6 @@ const styles = StyleSheet.create({
     listSub: { fontSize: 13, opacity: 0.6 },
     deleteBtn: { padding: 8 },
 
-    // Modal
     modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)', padding: 20 },
     modalContent: { padding: 24, borderRadius: 20 },
     modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },

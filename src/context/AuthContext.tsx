@@ -24,15 +24,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [userToken, setUserToken] = useState<string | null>(null);
 
     const [request, response, promptAsyncGoogle] = Google.useAuthRequest({
-        // Configure seus IDs do Google Cloud aqui se tiver
-        androidClientId: "SEU_ANDROID_CLIENT_ID",
-        iosClientId: "SEU_IOS_CLIENT_ID",
+        androidClientId: "561119182642-1lhaj56cpd7rej96vbeb0gu8ala1t0sj.apps.googleusercontent.com"
     });
 
     useEffect(() => {
         if (response?.type === 'success') {
             const { authentication } = response;
-            // Em produção, enviaríamos este token para o backend validar
             signInSocial(authentication!.accessToken, 'GOOGLE');
         }
     }, [response]);
@@ -42,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 const token = await SecureStore.getItemAsync('userToken');
                 if (token) {
-                    // Verifica expiração simples (opcional)
                     const decoded: any = jwtDecode(token);
                     if (decoded.exp * 1000 < Date.now()) {
                         await signOut();
@@ -52,7 +48,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     }
                 }
             } catch {
-                // Token inválido ou corrompido
                 await signOut();
             } finally {
                 setIsLoading(false);

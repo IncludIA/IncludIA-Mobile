@@ -8,7 +8,6 @@ import { useTheme } from '../../../context/ThemeContext';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../../../services/api';
 
-// Mock para Demo
 const MOCK_JOBS = [
     { id: '1', titulo: 'Desenvolvedor Java Senior', status: 'ATIVA', candidatos: 15, matches: 3, views: 142 },
     { id: '2', titulo: 'Product Designer', status: 'PAUSADA', candidatos: 8, matches: 0, views: 56 },
@@ -23,15 +22,14 @@ export default function RecruiterDashboardScreen({ navigation }: any) {
     const loadJobs = async () => {
         setLoading(true);
         try {
-            // Tenta buscar da API
             const response = await api.get('/vagas/me');
             if (response.data.content && response.data.content.length > 0) {
                 setJobs(response.data.content);
             } else {
-                setJobs(MOCK_JOBS); // Fallback se vazio
+                setJobs(MOCK_JOBS);
             }
         } catch (error) {
-            setJobs(MOCK_JOBS); // Fallback se erro
+            setJobs(MOCK_JOBS);
         } finally {
             setLoading(false);
         }
@@ -44,7 +42,6 @@ export default function RecruiterDashboardScreen({ navigation }: any) {
     const renderJobItem = ({ item }: any) => (
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
 
-            {/* Header do Card */}
             <View style={styles.cardHeader}>
                 <View style={{ flex: 1 }}>
                     <Text style={[styles.jobTitle, { color: colors.text }]} numberOfLines={1}>{item.titulo}</Text>
@@ -57,7 +54,6 @@ export default function RecruiterDashboardScreen({ navigation }: any) {
                 </View>
             </View>
 
-            {/* Estatísticas */}
             <View style={[styles.statsContainer, { backgroundColor: colors.background }]}>
                 <View style={styles.statItem}>
                     <Text style={[styles.statValue, { color: colors.text }]}>{item.candidatos || 0}</Text>
@@ -75,7 +71,6 @@ export default function RecruiterDashboardScreen({ navigation }: any) {
                 </View>
             </View>
 
-            {/* Botão de Ação (CTA) */}
             <TouchableOpacity
                 style={[styles.actionBtn, { backgroundColor: colors.primary }]}
                 onPress={() => navigation.navigate('CandidateFeed', { vagaId: item.id, jobTitle: item.titulo })}

@@ -29,7 +29,7 @@ export default function PostJobScreen({ navigation }: any) {
                 ...form,
                 salarioMin: Number(form.salarioMin) || 0,
                 salarioMax: Number(form.salarioMax) || 0,
-                skillIds: [] // Futuro: Selecionar skills
+                skillIds: []
             });
             Alert.alert("Sucesso", "Vaga publicada e a IA já está analisando candidatos!");
             navigation.goBack();

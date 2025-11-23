@@ -3,13 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
-
-// Telas do Candidato
-
 import EditProfileScreen from '../screens/app/config/EditProfileScreen';
-
-// Telas Comuns (Matches, Chat, Config)
-
 import ConfigAppScreen from '../screens/app/config/ConfigAppScreen';
 import NotificationScreen from '../screens/app/config/NotificationScreen';
 import PrivacySecurityScreen from '../screens/app/config/PrivacySecurityScreen';
@@ -36,7 +30,6 @@ import VisibilityScreen from '../screens/app/config/privacy/VisibilityScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// --- STACKS ESPECÍFICAS DO CANDIDATO ---
 
 const HomeStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

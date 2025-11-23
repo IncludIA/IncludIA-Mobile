@@ -32,7 +32,6 @@ export default function ChangePasswordScreen({ navigation }: any) {
 
         setLoading(true);
         try {
-            // Chamada para sua API Java (Necessário criar endpoint no AuthController)
             await api.post('/auth/change-password', {
                 oldPassword: currentPass,
                 newPassword: newPass
